@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+"""
+SWE-bench Heavy: Get Next Issue Tool
+Selects the next issue for the bot to work on based on current state and strategy.
+"""
+import json
+import os
+import sys
+from datetime import datetime
+from typing import Dict, Any, Optional
+
+def load_state() -> Dict[str, Any]:
+    """Load current test state."""
+    try:
+        with open('state.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print("ERROR: state.json not found. Run setup first.")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Invalid state.json: {e}")
+        sys.exit(1)
+
+def load_dataset() -> list:
+    """Load SWE-bench Lite dataset."""
+    state = load_state()
+    dataset_file = state['test_config']['dataset_file']
+    
+    if not os.path.exists(dataset_file):
+        print(f"ERROR: Dataset file {dataset_file} not found.")
+        print("Run the setup script to download the dataset.")
+        sys.exit(1)
+    
+    issues = []
+    try:
+        with open(dataset_file, 'r') as f:
+            for line in f:
+                if line.strip():
+                    issues.append(json.loads(line))
+        return issues
+    except Exception as e:
+        print(f"ERROR: Failed to load dataset: {e}")
+        sys.exit(1)
+
+def update_state(state: Dict[str, Any]) -> None:
+    """Save updated state."""
+    state['current_state']['last_activity'] = datetime.now().isoformat()
+    with open('state.json', 'w') as f:
+        json.dump(state, f, indent=2)
+
+def select_next_issue(state: Dict[str, Any], issues: list) -> Optional[Dict[str, Any]]:
+    """Select next issue based on strategy."""
+    config = state['test_config']
+    current = state['current_state']
+    
+    # Check if we have retry queue items
+    if state['retry_queue']:
+        issue_id = state['retry_queue'].pop(0)
+        for issue in issues:
+            if issue['instance_id'] == issue_id:
+                print(f"RETRY: Selecting issue {issue_id} from retry queue")
+                return issue
+    
+    # Find next unprocessed issue
+    start_idx = config['start_index']
+    end_idx = config['end_index']
+    
+    for i in range(start_idx, min(end_idx + 1, len(issues))):
+        issue = issues[i]
+        issue_id = issue['instance_id']
+        
+        # Skip if already completed
+        if issue_id in state['completed_issues']:
+            continue
+            
+        # Skip if currently failed (will be in retry queue if we want to retry)
+        if issue_id in state['failed_issues'] and issue_id not in state['retry_queue']:
+            continue
+            
+        return issue
+    
+    return None
+
+def main():
+    """Main entry point."""
+    state = load_state()
+    issues = load_dataset()
+    
+    # Initialize session if first run
+    if not state['current_state']['session_start']:
+        state['current_state']['session_start'] = datetime.now().isoformat()
+    
+    next_issue = select_next_issue(state, issues)
+    
+    if not next_issue:
+        print("No more issues to process!")
+        print(f"Completed: {len(state['completed_issues'])}")
+        print(f"Failed: {len(state['failed_issues'])}")
+        print(f"Skipped: {len(state['skipped_issues'])}")
+        sys.exit(0)
+    
+    issue_id = next_issue['instance_id']
+    
+    # Update state
+    state['current_state']['current_issue_index'] = issues.index(next_issue)
+    update_state(state)
+    
+    # Output issue information
+    print(f"ISSUE_ID: {issue_id}")
+    print(f"REPO: {next_issue['repo']}")
+    print(f"BASE_COMMIT: {next_issue['base_commit']}")
+    print(f"PROBLEM_STATEMENT:")
+    print(next_issue['problem_statement'])
+    print(f"\nHINTS_TEXT:")
+    print(next_issue.get('hints_text', 'No hints available'))
+    print(f"\nTEST_PATCH:")
+    print(next_issue.get('test_patch', 'No test patch available'))
+    
+    # Create issue-specific directory
+    issue_dir = f"issues/{issue_id}"
+    os.makedirs(issue_dir, exist_ok=True)
+    
+    # Save issue details to file
+    with open(f"{issue_dir}/issue.json", 'w') as f:
+        json.dump(next_issue, f, indent=2)
+    
+    print(f"\nIssue details saved to: {issue_dir}/issue.json")
+    print(f"Work directory: {issue_dir}")
+
+if __name__ == "__main__":
+    main()

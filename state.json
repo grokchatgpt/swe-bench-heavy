@@ -1,0 +1,31 @@
+{
+  "test_config": {
+    "mode": "RANGE",
+    "total_issues": 2,
+    "dataset_file": "swe_bench_lite.jsonl",
+    "start_index": 299,
+    "end_index": 300
+  },
+  "current_state": {
+    "current_issue_index": 299,
+    "issues_attempted": 1,
+    "issues_passed": 0,
+    "issues_failed": 0,
+    "issues_skipped": 1,
+    "last_activity": "2025-06-23T16:08:27.123909",
+    "session_start": "2025-06-23T16:08:27.094883"
+  },
+  "issue_status": {
+    "test_setup": {
+      "status": "SKIP",
+      "timestamp": "2025-06-23T16:08:27.123901",
+      "notes": "Setup test"
+    }
+  },
+  "failed_issues": [],
+  "skipped_issues": [
+    "test_setup"
+  ],
+  "completed_issues": [],
+  "retry_queue": []
+}
