@@ -1,53 +1,96 @@
 # SWE-bench Heavy
 
-## Goal
-Provide a benchmark testing autonomous AI conversation coherence by adapting the SWE-bench data set in a different test administration. The Heavy administration of this test is designed to mimic human-like issue resolution without aids and solving multiple issues in the same session.
+## Objective
 
-## Description
-Leverage SWE-bench Lite (300 GitHub issue-PR pairs from 11 Python projects) to test a bot’s ability to solve issues autonomously, mimicking a human coder. Remove all "cheats/aids" (BM25 retrieval, Oracle hints, RAG, separate sessions). Isolate the environment (tools and data). Allow the bot to choose its workflow, tackling one issue at a time, with freedom to revisit failed issues on later passes. This test is essentially: "hey, we have 300 bugs in 12 differenent code bases - go fix them all". There is no advanced configuration required for humans to deploy for the bot to solve these issues. Any set of problems can be substituted in this benchmark workflow and it should not affect the bot's ability to solve the issues. 
+SWE-bench Heavy provides a benchmark for evaluating autonomous AI coding capabilities by adapting the SWE-bench dataset with a novel administration methodology. This benchmark is designed to assess AI performance in human-like issue resolution scenarios without auxiliary aids, requiring sustained coherence across multiple issues within a single session.
 
-**Why "Heavy"**: Inference aids like RAG, Oracle, BM25, etc. are very powerful tools - however they all require setup in advance and maintainance. Those requirements make them less than ideal solutions for general AI Agent tasks. The 300 issues in the Lite dataset make for perfect adaptation material to be administered in a workflow without inference aids. The Authors of SWE-bench selected the 300 issues because they are all verified and chosen to minimize the cost of testing. 
+## Overview
 
-## Scoring
-Heavy is intended to measure the bot's correctness and cost over the span of issues. Correctness is measured by the number of issues he resolves out of the data set. Cost is measured by cache efficiency & total input/output tokens. Cost is automatically tracked in coding tools like Cline and Cursor. Correctness is already tracked by existing tooling in the SWE-bench.
+SWE-bench Heavy leverages the SWE-bench Lite dataset (300 GitHub issue-PR pairs from 11 Python projects) to evaluate an AI system's ability to autonomously resolve software engineering issues. The benchmark eliminates common performance aids including BM25 retrieval, Oracle hints, RAG systems, and session isolation. The testing environment provides only essential tools and data, allowing the AI to develop its own workflow while tackling issues sequentially with the flexibility to revisit failed attempts.
 
-## Environment
-- Pre-configure all tools: Git, Python, MCP (filesystem & shell-command-server), and permissions.
-- Ensure bot has access to repos and test specs.
-- test tooling: get issue; tests solution; records result; tracks progress and provides bot with way to automatically record progress incrementally; tracks state for easy continuation; 
-- tooling also includes script to download and install all repos ahead of time; ensure all issues have standard input files and test cases; a script is available to clean results and solutions from the repos and reset test state for new test runs; the get next issue tool is preconfigured based on your test config params: 'ALL' - 300; SIZE - first N issues; RANGE - issue index M to N;
+The core challenge can be summarized as: "Given 300 verified bugs across 12 different codebases, resolve as many as possible autonomously." The benchmark requires no specialized configuration beyond standard development tools, making it broadly applicable to various problem sets without affecting the AI's problem-solving approach.
 
-## Data
-Use SWE-bench Lite dataset (`swe_bench_lite.jsonl`). Evaluation via unit tests, using post-PR behavior as reference, administered in a self-directed, human-like style without BM25 or Oracle aids.
+**Rationale for "Heavy" Designation**: While inference aids such as RAG, Oracle systems, and BM25 retrieval demonstrate significant performance benefits, they require substantial setup and maintenance overhead. These requirements limit their applicability for general-purpose AI agent tasks. The 300 issues in the SWE-bench Lite dataset provide an ideal foundation for evaluation without such aids, as they were specifically selected and verified by the original authors to minimize testing costs while maintaining quality.
+
+## Evaluation Metrics
+
+SWE-bench Heavy measures two primary dimensions:
+
+1. **Correctness**: The proportion of successfully resolved issues from the total attempted
+2. **Efficiency**: Resource utilization measured through cache efficiency and total input/output token consumption
+
+Cost tracking is automatically handled by modern coding environments (Cline, Cursor, etc.), while correctness evaluation leverages existing SWE-bench infrastructure.
+
+## Testing Environment
+
+The benchmark provides a controlled environment with the following characteristics:
+
+- **Pre-configured toolchain**: Git, Python, and necessary permissions
+- **Repository access**: Complete access to codebases and test specifications
+- **Automated tooling suite**:
+  - Issue selection and presentation
+  - Solution validation and testing
+  - Progress tracking and state management
+  - Incremental progress recording
+  - Session resumption capabilities
+
+Additional infrastructure includes:
+- Automated repository download and setup scripts
+- Standardized input files and test cases for all issues
+- Environment reset and cleanup utilities
+- Configurable test scope: ALL (300 issues), SIZE (first N issues), or RANGE (issues M through N)
+
+## Dataset and Evaluation
+
+The benchmark utilizes the SWE-bench Lite dataset (`swe_bench_lite.jsonl`) with evaluation conducted through unit testing, using post-PR behavior as the reference standard. The evaluation methodology emphasizes self-directed, human-like problem-solving approaches without retrieval or hint systems.
 
 ## Administration
-This test is designed to be 100% self administered. You configure how many and which problems are used for the test. See install.md for how to configure and prepare a run and how to reset and clean up after runs. The test is designed so bots even w/o context can continue where they left off in test runs if the run is interrupted. It is up to you to configure the tests and observe testing. There are no fail-safes in this test around confused/looping bots. 
 
-## Evaluation Flow
-0. **Start**: run setup.py (ranges are 0 based and inclusive); in vscode Cline/Cursor tell the bot: "read instructions.md and attempt completion when all issues are resolved"
-1. **Input**:
-   - Bot receives: issue text, repo URL, commit hash, test specs.
-   - No BM25 retrieval or Oracle hints.
-2. **Bot Workflow**:
-   - gets the next issue to work on from tooling. 
-   - Autonomously analyzes issue, explores repo, edits files, and runs tests (`grading_fast.py`).
-   - Decides to pass, retry, or quit. Can revisit failed issues later.
-   - Tooling records progress and state so if session is interrupted, the bot can continue where he left off without repeating workflow.
-   - Chooses next issue freely (no enforced order).
-3. **Evaluation**:
-   - Modified `run_evaluation.py` to disable BM25 and Oracle.
-4. **Toolchain**:
-   - Filesystem mcp, Shellserver mcp, Git for cloning, Python for tests, heavy tool chain self-administration.
-   - Ensure bot has full access to tools and repos.
-5. **Failure Handling**:
-   - Bot retries or quits at discretion, logging attempts.
-   - Failed issues can be revisited on later passes.
+SWE-bench Heavy is designed for complete self-administration. Users configure the problem scope and observe testing progress. The system supports seamless resumption of interrupted sessions, allowing AI systems to continue from their last checkpoint without context loss. The benchmark includes no safeguards against confused or looping AI behavior, providing an authentic evaluation environment.
 
-## Rules
-1. No modifications to test tooling
-2. Any interruptions must resume using same conversation context window - Test results are only valid in the same session.
-3. No additional tools beyond filesystem, shell-command-server, and whatever context window management you choose (Cline/Cursor/etc all have their own implementations).
-4. Do not add any inference aids as they defeat the purpose of this benchmark.
+## Evaluation Protocol
 
-## Expected Results
-Tests will reveal how many issues the bot was able to resolve out of the number of issues he attempted. Tests will reveal the exact cost of the effort.
+### Setup Phase
+1. Execute `setup.py` (note: ranges are zero-indexed and inclusive)
+2. In VSCode with Cline/Cursor: instruct the AI to "read instructions.md and attempt completion when all issues are resolved"
+
+### Input Specification
+- Issue description and context
+- Repository URL and commit hash
+- Test specifications
+- **Excluded**: BM25 retrieval, Oracle hints, or other auxiliary aids
+
+### AI Workflow
+1. **Issue Selection**: Retrieve next issue from tooling
+2. **Analysis and Implementation**: Autonomous issue analysis, codebase exploration, file modification, and solution testing using `grading_fast.py`
+3. **Decision Making**: Determine whether to mark as passed, retry, or skip
+4. **Progress Management**: Automated progress and state recording for session continuity
+5. **Issue Prioritization**: Free selection of next issue (no enforced ordering)
+
+### Technical Infrastructure
+- **Core Tools**: Filesystem MCP, Shell-command-server MCP
+- **Version Control**: Git for repository management
+- **Testing**: Python-based test execution
+- **Administration**: Self-contained toolchain
+
+### Error Handling
+- AI-directed retry and skip decisions with comprehensive logging
+- Support for revisiting failed issues in subsequent passes
+- Flexible failure recovery mechanisms
+
+## Constraints and Requirements
+
+1. **No tooling modifications**: Test infrastructure must remain unaltered
+2. **Session continuity**: Interruptions must resume within the same conversation context window for valid results
+3. **Tool limitations**: Only filesystem, shell-command-server, and chosen context window management systems permitted
+4. **No auxiliary aids**: Inference aids are prohibited as they contradict the benchmark's core objectives
+
+## Expected Outcomes
+
+SWE-bench Heavy will quantify:
+- **Resolution rate**: Number of successfully resolved issues relative to attempts
+- **Resource efficiency**: Precise cost measurement of the problem-solving effort
+- **Sustained performance**: AI capability across extended problem-solving sessions
+- **Autonomous decision-making**: Quality of issue prioritization and retry strategies
+
+This benchmark provides valuable insights into AI coding capabilities in realistic, resource-constrained environments without performance-enhancing aids.
