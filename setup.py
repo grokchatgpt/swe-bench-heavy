@@ -103,7 +103,7 @@ def make_scripts_executable():
     scripts = [
         'get_next_issue.py',
         'record_progress.py',
-        'grading.py',
+        'grading_fast.py',
         'setup.py',
         'cleanup.py'
     ]

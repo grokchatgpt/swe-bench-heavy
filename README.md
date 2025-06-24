@@ -1,11 +1,14 @@
 # swe-bench-heavy
 
-A fresh start for SWE-Bench heavy testing and development.
+SWE-Bench Heavy - Autonomous AI Coherence Benchmark Test.
 
 ## Getting Started
 
-This repository contains tools and scripts for working with SWE-Bench heavy evaluation tasks.
+- Read heavy.md. 
+- run setup.py to clone all the repos to disk ahead of testing and configure the test
+- in VSCode, put bot in Act with all tools autoenabled and tell bot: "read instructions.md"
+- check progress.md or state.json periodically - bot will attempt completion in VSCode when finished
 
 ## Setup
 
-More details coming soon...
+see install.md

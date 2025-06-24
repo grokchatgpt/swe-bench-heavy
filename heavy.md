@@ -12,7 +12,7 @@ Leverage SWE-bench Lite (300 GitHub issue-PR pairs from 11 Python projects) to t
 Heavy is intended to measure the bot's correctness and cost over the span of issues. Correctness is measured by the number of issues he resolves out of the data set. Cost is measured by cache efficiency & total input/output tokens. Cost is automatically tracked in coding tools like Cline and Cursor. Correctness is already tracked by existing tooling in the SWE-bench.
 
 ## Environment
-- Pre-configure all tools: Git, Python, and permissions.
+- Pre-configure all tools: Git, Python, MCP (filesystem & shell-command-server), and permissions.
 - Ensure bot has access to repos and test specs.
 - test tooling: get issue; tests solution; records result; tracks progress and provides bot with way to automatically record progress incrementally; tracks state for easy continuation; 
 - tooling also includes script to download and install all repos ahead of time; ensure all issues have standard input files and test cases; a script is available to clean results and solutions from the repos and reset test state for new test runs; the get next issue tool is preconfigured based on your test config params: 'ALL' - 300; SIZE - first N issues; RANGE - issue index M to N;
@@ -24,13 +24,13 @@ Use SWE-bench Lite dataset (`swe_bench_lite.jsonl`). Evaluation via unit tests, 
 This test is designed to be 100% self administered. You configure how many and which problems are used for the test. See install.md for how to configure and prepare a run and how to reset and clean up after runs. The test is designed so bots even w/o context can continue where they left off in test runs if the run is interrupted. It is up to you to configure the tests and observe testing. There are no fail-safes in this test around confused/looping bots. 
 
 ## Evaluation Flow
-0. **Start**: in vscode Cline/Cursor tell the bot: "read instructions.md and attempt completion when all issues are resolved"
+0. **Start**: run setup.py (ranges are 0 based and inclusive); in vscode Cline/Cursor tell the bot: "read instructions.md and attempt completion when all issues are resolved"
 1. **Input**:
    - Bot receives: issue text, repo URL, commit hash, test specs.
    - No BM25 retrieval or Oracle hints.
 2. **Bot Workflow**:
    - gets the next issue to work on from tooling. 
-   - Autonomously analyzes issue, explores repo, edits files, and runs tests (`grading.py`).
+   - Autonomously analyzes issue, explores repo, edits files, and runs tests (`grading_fast.py`).
    - Decides to pass, retry, or quit. Can revisit failed issues later.
    - Tooling records progress and state so if session is interrupted, the bot can continue where he left off without repeating workflow.
    - Chooses next issue freely (no enforced order).
@@ -43,7 +43,11 @@ This test is designed to be 100% self administered. You configure how many and w
    - Bot retries or quits at discretion, logging attempts.
    - Failed issues can be revisited on later passes.
 
+## Rules
+1. No modifications to test tooling
+2. Any interruptions must resume using same conversation context window - Test results are only valid in the same session.
+3. No additional tools beyond filesystem, shell-command-server, and whatever context window management you choose (Cline/Cursor/etc all have their own implementations).
+4. Do not add any inference aids as they defeat the purpose of this benchmark.
+
 ## Expected Results
 Tests will reveal how many issues the bot was able to resolve out of the number of issues he attempted. Tests will reveal the exact cost of the effort.
-   
-

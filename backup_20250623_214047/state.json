@@ -1,0 +1,50 @@
+{
+  "test_config": {
+    "mode": "RANGE",
+    "total_issues": 3,
+    "dataset_file": "swe_bench_lite.jsonl",
+    "start_index": 297,
+    "end_index": 299
+  },
+  "current_state": {
+    "current_issue_index": 299,
+    "issues_attempted": 5,
+    "issues_passed": 3,
+    "issues_failed": 0,
+    "issues_skipped": 2,
+    "last_activity": "2025-06-23T21:24:52.155532",
+    "session_start": "2025-06-23T16:08:27.094883"
+  },
+  "issue_status": {
+    "test_setup": {
+      "status": "SKIP",
+      "timestamp": "2025-06-23T20:17:20.326362",
+      "notes": "Setup test"
+    },
+    "sympy__sympy-24152": {
+      "status": "PASS",
+      "timestamp": "2025-06-23T21:05:58.157153",
+      "notes": "Fixed TensorProduct expansion bug - tooling test successful"
+    },
+    "sympy__sympy-24213": {
+      "status": "PASS",
+      "timestamp": "2025-06-23T21:12:26.215946",
+      "notes": "Fixed collect_factor_and_dimension to detect equivalent dimensions in addition by using dimension system's equivalent_dims method instead of direct comparison"
+    },
+    "sympy__sympy-24909": {
+      "status": "PASS",
+      "timestamp": "2025-06-23T21:24:52.155526",
+      "notes": "Fixed milli prefix bug by restricting fact==1 condition to Prefix*Prefix operations only"
+    }
+  },
+  "failed_issues": [],
+  "skipped_issues": [
+    "test_setup"
+  ],
+  "completed_issues": [
+    "sympy__sympy-24152",
+    "sympy__sympy-24213",
+    "sympy__sympy-24909"
+  ],
+  "retry_queue": []
+}

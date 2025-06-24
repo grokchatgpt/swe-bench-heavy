@@ -86,7 +86,7 @@ def apply_test_patch(test_env_dir: str, issue_data: Dict[str, Any]) -> bool:
 
 def copy_solution_files(test_env_dir: str, issue_id: str) -> None:
     """Copy solution files from the working directory to test environment."""
-    work_dir = f"issues/{issue_id}/repo"
+    work_dir = f"runs/{issue_id}"
     
     # If no solution directory exists, create it from the pre-downloaded repo
     if not os.path.exists(work_dir):

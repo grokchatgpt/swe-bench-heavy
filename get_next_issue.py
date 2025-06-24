@@ -124,8 +124,27 @@ def main():
     with open(f"{issue_dir}/issue.json", 'w') as f:
         json.dump(next_issue, f, indent=2)
     
+    # Set up working directory in runs folder
+    work_dir = f"runs/{issue_id}"
+    repo_source = f"repos/{issue_id}/repo"
+    
+    if os.path.exists(repo_source):
+        # Remove existing work directory if it exists
+        if os.path.exists(work_dir):
+            import shutil
+            shutil.rmtree(work_dir)
+        
+        # Copy repo to runs directory for work
+        import shutil
+        shutil.copytree(repo_source, work_dir)
+        print(f"Repository copied from: {repo_source}")
+        print(f"Work directory: {work_dir}")
+    else:
+        print(f"WARNING: Pre-downloaded repo not found at {repo_source}")
+        print("Bot will need to clone the repository manually")
+        print(f"Work directory: {issue_dir}")
+    
     print(f"\nIssue details saved to: {issue_dir}/issue.json")
-    print(f"Work directory: {issue_dir}")
 
 if __name__ == "__main__":
     main()
