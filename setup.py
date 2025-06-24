@@ -57,7 +57,9 @@ def download_dataset():
 def verify_prerequisites():
     """Check that required tools are available."""
     required_tools = ['git', 'rsync']
-    python_tools = ['python3', 'pip3']  # Check for python3 and pip3 specifically
+    python_tools = ['python3', 'pip3']
+    
+    # Check for python3 and pip3 specifically
     missing_tools = []
     
     # Check standard tools
@@ -125,16 +127,19 @@ def validate_dataset():
     try:
         issue_count = 0
         issue_ids = []
+        
         with open(dataset_file, 'r') as f:
             for line in f:
                 if line.strip():
                     issue = json.loads(line)
+                    
                     # Validate required fields
                     required_fields = ['instance_id', 'repo', 'base_commit', 'problem_statement']
                     for field in required_fields:
                         if field not in issue:
                             print(f"ERROR: Missing required field '{field}' in dataset")
                             return False
+                    
                     issue_ids.append(issue['instance_id'])
                     issue_count += 1
         
@@ -143,6 +148,7 @@ def validate_dataset():
         # Validate that all repos are pre-downloaded
         print("Validating pre-downloaded repositories...")
         missing_repos = []
+        
         for issue_id in issue_ids:
             repo_path = f"repos/{issue_id}"
             if not os.path.exists(repo_path):
@@ -161,13 +167,14 @@ def validate_dataset():
         
         print(f"✅ All {issue_count} repositories are present in repos/ directory")
         return True
+        
     except Exception as e:
         print(f"ERROR: Failed to validate dataset: {e}")
         return False
 
 
 def install_python_dependencies():
-    """Install required Python packages."""
+    """Install required Python packages with proper environment handling."""
     packages = [
         'pytest',
         'requests',
@@ -175,13 +182,49 @@ def install_python_dependencies():
     ]
     
     print("Installing Python dependencies...")
+    
+    # Check if we're in a virtual environment
+    in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
+    
+    if in_venv:
+        print("✅ Virtual environment detected")
+    else:
+        print("⚠️ Not in virtual environment - will try multiple installation methods")
+    
     for package in packages:
-        try:
-            subprocess.run([sys.executable, '-m', 'pip', 'install', package], 
-                         check=True, capture_output=True)
-            print(f"✅ Installed: {package}")
-        except subprocess.CalledProcessError as e:
-            print(f"WARNING: Failed to install {package}: {e}")
+        success = False
+        install_methods = []
+        
+        if in_venv:
+            # In virtual environment - use normal pip
+            install_methods.append([sys.executable, '-m', 'pip', 'install', package])
+        else:
+            # Not in venv - try user install first, then system with break-system-packages
+            install_methods.extend([
+                [sys.executable, '-m', 'pip', 'install', '--user', package],
+                [sys.executable, '-m', 'pip', 'install', '--break-system-packages', package]
+            ])
+        
+        for method in install_methods:
+            try:
+                result = subprocess.run(method, check=True, capture_output=True, text=True)
+                print(f"✅ Installed: {package}")
+                success = True
+                break
+            except subprocess.CalledProcessError as e:
+                continue
+        
+        if not success:
+            print(f"⚠️ Could not install {package} - checking if already available...")
+            
+            # Check if package is available anyway
+            try:
+                __import__(package.replace('-', '_'))
+                print(f"✅ {package} is already available")
+            except ImportError:
+                print(f"❌ {package} not available")
+                print(f"   To fix: Create virtual environment with:")
+                print(f"   python3 -m venv swe_venv && source swe_venv/bin/activate && python3 setup.py")
 
 
 def configure_test_mode():
@@ -276,8 +319,7 @@ def test_setup():
     # Test get_next_issue.py
     print("Testing issue selection...")
     try:
-        result = subprocess.run(['python3', 'get_next_issue.py'], 
-                              capture_output=True, text=True, timeout=30)
+        result = subprocess.run(['python3', 'get_next_issue.py'], capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
             print("✅ Issue selection works")
         else:

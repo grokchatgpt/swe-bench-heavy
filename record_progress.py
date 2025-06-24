@@ -29,6 +29,13 @@ def update_state(state: Dict[str, Any]) -> None:
         json.dump(state, f, indent=2)
 
 
+def is_benchmark_issue(issue_id: str) -> bool:
+    """Check if this is a real benchmark issue (not setup/test)."""
+    # Exclude setup and test issues from statistics
+    setup_patterns = ['test_setup', 'setup_test', 'test_issue']
+    return issue_id not in setup_patterns and not issue_id.startswith('test_')
+
+
 def update_progress_log(issue_id: str, status: str, notes: str = "") -> None:
     """Update the human-readable progress log."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -139,18 +146,23 @@ def main():
     state = load_state()
     current = state['current_state']
     
-    # Update counters
-    current['issues_attempted'] += 1
+    # Only update counters for real benchmark issues
+    is_real_issue = is_benchmark_issue(issue_id)
+    
+    if is_real_issue:
+        current['issues_attempted'] += 1
     
     if status == 'PASS':
-        current['issues_passed'] += 1
+        if is_real_issue:
+            current['issues_passed'] += 1
         state['completed_issues'].append(issue_id)
         # Remove from other lists if present
         for lst in ['failed_issues', 'skipped_issues', 'retry_queue']:
             if issue_id in state[lst]:
                 state[lst].remove(issue_id)
     elif status == 'FAIL':
-        current['issues_failed'] += 1
+        if is_real_issue:
+            current['issues_failed'] += 1
         if issue_id not in state['failed_issues']:
             state['failed_issues'].append(issue_id)
         # Remove from other lists if present
@@ -158,7 +170,8 @@ def main():
             if issue_id in state[lst]:
                 state[lst].remove(issue_id)
     elif status == 'SKIP':
-        current['issues_skipped'] += 1
+        if is_real_issue:
+            current['issues_skipped'] += 1
         if issue_id not in state['skipped_issues']:
             state['skipped_issues'].append(issue_id)
         # Remove from other lists if present
@@ -197,6 +210,10 @@ def main():
     if current['issues_attempted'] > 0:
         success_rate = current['issues_passed'] / current['issues_attempted'] * 100
         print(f"- Success Rate: {success_rate:.1f}%")
+    
+    # Show if this was excluded from stats
+    if not is_real_issue:
+        print(f"\nNOTE: '{issue_id}' excluded from benchmark statistics (setup/test issue)")
 
 
 if __name__ == "__main__":
