@@ -208,6 +208,63 @@ def save_test_results(issue_id: str, passed: bool, output: str) -> None:
         f.write(output)
 
 
+def auto_record_progress(issue_id: str, passed: bool, output: str) -> None:
+    """Automatically record progress based on grading results."""
+    try:
+        if passed:
+            status = "PASS"
+            notes = "Passed official grading tests"
+        else:
+            status = "FAIL"
+            # Extract meaningful error info from output
+            lines = output.split('\n')
+            error_lines = [line for line in lines if 'ERROR' in line or 'FAILED' in line or 'AssertionError' in line]
+            if error_lines:
+                notes = f"Failed official tests: {error_lines[0][:100]}..."
+            else:
+                notes = "Failed official grading tests"
+        
+        # Call record_progress.py to update state
+        result = subprocess.run([
+            sys.executable, 'record_progress.py', issue_id, status, notes
+        ], capture_output=True, text=True, timeout=30)
+        
+        if result.returncode == 0:
+            print(f"📝 Progress automatically recorded: {issue_id} - {status}")
+        else:
+            print(f"⚠️ Failed to record progress: {result.stderr}")
+    
+    except Exception as e:
+        print(f"⚠️ Failed to auto-record progress: {e}")
+
+
+def create_issue_metadata(issue_data: Dict[str, Any], issue_id: str) -> None:
+    """Create issue.json file from dataset if missing."""
+    issue_dir = f"issues/{issue_id}"
+    issue_file = f"{issue_dir}/issue.json"
+    
+    if not os.path.exists(issue_file):
+        os.makedirs(issue_dir, exist_ok=True)
+        
+        # Create issue metadata from dataset
+        issue_metadata = {
+            'instance_id': issue_data['instance_id'],
+            'repo': issue_data['repo'],
+            'base_commit': issue_data['base_commit'],
+            'problem_statement': issue_data['problem_statement'],
+            'FAIL_TO_PASS': issue_data.get('FAIL_TO_PASS', []),
+            'PASS_TO_PASS': issue_data.get('PASS_TO_PASS', []),
+            'test_patch': issue_data.get('test_patch', ''),
+            'patch': issue_data.get('patch', ''),
+            'created_at': subprocess.run(['date', '-Iseconds'], capture_output=True, text=True).stdout.strip()
+        }
+        
+        with open(issue_file, 'w') as f:
+            json.dump(issue_metadata, f, indent=2)
+        
+        print(f"Created issue metadata: {issue_file}")
+
+
 def main():
     """Main entry point."""
     if len(sys.argv) != 2:
@@ -216,10 +273,33 @@ def main():
     
     issue_id = sys.argv[1]
     
-    # Load issue data
-    issue_data = load_issue_data(issue_id)
+    # Load issue data from dataset
+    try:
+        with open('swe_bench_lite.jsonl', 'r') as f:
+            issue_data = None
+            for line in f:
+                if line.strip():
+                    issue = json.loads(line)
+                    if issue['instance_id'] == issue_id:
+                        issue_data = issue
+                        break
+            
+            if not issue_data:
+                print(f"ERROR: Issue {issue_id} not found in dataset")
+                sys.exit(1)
+    
+    except FileNotFoundError:
+        print("ERROR: swe_bench_lite.jsonl not found!")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Invalid dataset format: {e}")
+        sys.exit(1)
+    
     print(f"Fast grading for issue: {issue_id}")
     print(f"Repository: {issue_data['repo']}")
+    
+    # Create issue metadata if missing
+    create_issue_metadata(issue_data, issue_id)
     
     # Set up test environment
     test_env_dir = setup_test_environment(issue_data, issue_id)
@@ -239,13 +319,18 @@ def main():
     # Save results
     save_test_results(issue_id, passed, output)
     
+    # Automatically record progress
+    auto_record_progress(issue_id, passed, output)
+    
     # Print results
     if passed:
         print("✅ TESTS PASSED")
         print("Solution appears to be correct!")
+        print("✅ Progress automatically recorded as PASS")
     else:
         print("❌ TESTS FAILED")
         print("Solution needs more work.")
+        print("📝 Progress automatically recorded as FAIL")
     
     print("\nTest Output:")
     print(output)

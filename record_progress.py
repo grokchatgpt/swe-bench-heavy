@@ -126,6 +126,61 @@ def update_progress_log(issue_id: str, status: str, notes: str = "") -> None:
         f.write('\n'.join(new_lines))
 
 
+def track_attempt(state: Dict[str, Any], issue_id: str, status: str, notes: str) -> None:
+    """Track individual attempts per issue."""
+    # Initialize issue attempts tracking if not exists
+    if 'issue_attempts' not in state:
+        state['issue_attempts'] = {}
+    
+    if issue_id not in state['issue_attempts']:
+        state['issue_attempts'][issue_id] = {
+            'attempt_count': 0,
+            'attempts': [],
+            'current_status': None
+        }
+    
+    # Increment attempt count for this issue
+    state['issue_attempts'][issue_id]['attempt_count'] += 1
+    attempt_num = state['issue_attempts'][issue_id]['attempt_count']
+    
+    # Record this attempt
+    attempt_record = {
+        'attempt': attempt_num,
+        'status': status,
+        'timestamp': datetime.now().isoformat(),
+        'notes': notes
+    }
+    
+    state['issue_attempts'][issue_id]['attempts'].append(attempt_record)
+    state['issue_attempts'][issue_id]['current_status'] = status
+    
+    print(f"📊 Attempt #{attempt_num} for {issue_id}: {status}")
+
+
+def update_attempt_statistics(state: Dict[str, Any]) -> None:
+    """Update statistics to include attempt tracking."""
+    current = state['current_state']
+    
+    # Calculate total attempts across all issues
+    total_attempts = 0
+    unique_issues_attempted = 0
+    
+    if 'issue_attempts' in state:
+        for issue_id, attempts_data in state['issue_attempts'].items():
+            if is_benchmark_issue(issue_id):
+                total_attempts += attempts_data['attempt_count']
+                unique_issues_attempted += 1
+    
+    # Update new statistics
+    current['total_attempts'] = total_attempts
+    current['unique_issues_attempted'] = unique_issues_attempted
+    
+    if unique_issues_attempted > 0:
+        current['avg_attempts_per_issue'] = total_attempts / unique_issues_attempted
+    else:
+        current['avg_attempts_per_issue'] = 0
+
+
 def main():
     """Main entry point."""
     if len(sys.argv) < 3:
@@ -149,13 +204,31 @@ def main():
     # Only update counters for real benchmark issues
     is_real_issue = is_benchmark_issue(issue_id)
     
-    if is_real_issue:
+    # Check if this issue had previous attempts and subtract old status
+    if is_real_issue and 'issue_attempts' in state and issue_id in state['issue_attempts']:
+        prev_attempts = state['issue_attempts'][issue_id]['attempts']
+        if len(prev_attempts) > 0:  # Had previous attempts
+            # Subtract previous result from counters
+            last_status = prev_attempts[-1]['status']
+            if last_status == 'PASS':
+                current['issues_passed'] -= 1
+            elif last_status == 'FAIL':
+                current['issues_failed'] -= 1
+            elif last_status == 'SKIP':
+                current['issues_skipped'] -= 1
+    
+    # Track this attempt (AFTER checking previous attempts)
+    track_attempt(state, issue_id, status, notes)
+    
+    # Update legacy counters (for first attempt only)
+    if is_real_issue and state['issue_attempts'][issue_id]['attempt_count'] == 1:
         current['issues_attempted'] += 1
     
     if status == 'PASS':
         if is_real_issue:
             current['issues_passed'] += 1
-        state['completed_issues'].append(issue_id)
+        if issue_id not in state['completed_issues']:
+            state['completed_issues'].append(issue_id)
         # Remove from other lists if present
         for lst in ['failed_issues', 'skipped_issues', 'retry_queue']:
             if issue_id in state[lst]:
@@ -183,12 +256,15 @@ def main():
         if issue_id not in state['retry_queue']:
             state['retry_queue'].append(issue_id)
     
-    # Update issue status tracking
+    # Update legacy issue status tracking (overwrites previous)
     state['issue_status'][issue_id] = {
         'status': status,
         'timestamp': datetime.now().isoformat(),
         'notes': notes
     }
+    
+    # Update attempt statistics
+    update_attempt_statistics(state)
     
     # Save state
     update_state(state)
@@ -202,14 +278,26 @@ def main():
     
     # Print current stats
     print(f"\nCurrent Progress:")
-    print(f"- Attempted: {current['issues_attempted']}/300")
+    print(f"- Unique Issues Attempted: {current.get('unique_issues_attempted', current['issues_attempted'])}/300")
+    print(f"- Total Attempts: {current.get('total_attempts', current['issues_attempted'])}")
     print(f"- Passed: {current['issues_passed']}")
     print(f"- Failed: {current['issues_failed']}")
     print(f"- Skipped: {current['issues_skipped']}")
     
-    if current['issues_attempted'] > 0:
-        success_rate = current['issues_passed'] / current['issues_attempted'] * 100
+    if current.get('unique_issues_attempted', current['issues_attempted']) > 0:
+        success_rate = current['issues_passed'] / current.get('unique_issues_attempted', current['issues_attempted']) * 100
         print(f"- Success Rate: {success_rate:.1f}%")
+        
+        avg_attempts = current.get('avg_attempts_per_issue', 1.0)
+        print(f"- Avg Attempts per Issue: {avg_attempts:.1f}")
+    
+    # Show attempt history for this issue
+    if is_real_issue and 'issue_attempts' in state and issue_id in state['issue_attempts']:
+        attempts_data = state['issue_attempts'][issue_id]
+        if attempts_data['attempt_count'] > 1:
+            print(f"\nAttempt History for {issue_id}:")
+            for attempt in attempts_data['attempts']:
+                print(f"  #{attempt['attempt']}: {attempt['status']} - {attempt['notes'][:50]}...")
     
     # Show if this was excluded from stats
     if not is_real_issue:

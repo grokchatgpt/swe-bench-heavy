@@ -3,6 +3,8 @@ runs/
 issues/
 logs/
 results/
+
+# github repos
 repos/
 
 # Python

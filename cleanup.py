@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SWE-bench Heavy: Cleanup Script
-Resets the test environment for new runs.
+Resets ONLY test data for new runs while preserving all production files.
 """
 import json
 import os
@@ -101,37 +101,25 @@ def reset_progress():
     print("✅ Progress log reset")
 
 
-def clean_issues_directory(specific_issues=None):
-    """Clean the issues directory."""
-    issues_dir = 'issues'
-    if not os.path.exists(issues_dir):
-        print("No issues directory found")
-        return
-
-    if specific_issues:
-        # Clean only specific issues
-        for issue_id in specific_issues:
-            issue_path = os.path.join(issues_dir, issue_id)
-            if os.path.exists(issue_path):
-                shutil.rmtree(issue_path)
-                print(f"✅ Cleaned issue: {issue_id}")
-            else:
-                print(f"⚠️ Issue not found: {issue_id}")
-    else:
-        # Clean entire issues directory
-        shutil.rmtree(issues_dir)
-        os.makedirs(issues_dir)
-        print("✅ All issue directories cleaned")
-
-
-def clean_logs():
-    """Clean log files."""
-    log_dirs = ['logs', 'results']
-    for log_dir in log_dirs:
-        if os.path.exists(log_dir):
-            shutil.rmtree(log_dir)
-            os.makedirs(log_dir)
-            print(f"✅ Cleaned {log_dir} directory")
+def clean_test_directories():
+    """Clean ONLY test data directories, preserve all production files."""
+    test_dirs = ['issues', 'logs', 'results', 'runs']
+    
+    for test_dir in test_dirs:
+        if os.path.exists(test_dir):
+            shutil.rmtree(test_dir)
+            print(f"✅ Cleaned test directory: {test_dir}")
+    
+    # Recreate runs directory (empty, for working copies)
+    os.makedirs('runs', exist_ok=True)
+    with open('runs/.gitignore', 'w') as f:
+        f.write("# Working copies - not tracked in git\n*\n!.gitignore\n")
+    
+    # Recreate other test directories
+    for test_dir in ['issues', 'logs', 'results']:
+        os.makedirs(test_dir, exist_ok=True)
+    
+    print("✅ Test directories reset")
 
 
 def backup_current_state():
@@ -180,18 +168,57 @@ def show_current_status():
         print("No current state found")
 
 
+def validate_environment():
+    """Validate that essential files are preserved."""
+    essential_files = [
+        'setup.py', 'get_next_issue.py', 'grading_fast.py', 'record_progress.py',
+        'instructions.md', 'heavy.md', 'install.md', 'swe_bench_lite.jsonl', 'clone_missing_repos.py'
+    ]
+    essential_dirs = ['repos']
+    
+    missing = []
+    for file in essential_files:
+        if not os.path.exists(file):
+            missing.append(file)
+    
+    for dir in essential_dirs:
+        if not os.path.exists(dir):
+            missing.append(f"{dir}/")
+    
+    if missing:
+        print(f"❌ CRITICAL: Missing essential files/dirs: {missing}")
+        print("This indicates the environment may be corrupted!")
+        return False
+    
+    # Check repos has content
+    if not os.listdir('repos'):
+        print("❌ CRITICAL: repos/ directory is empty!")
+        return False
+    
+    repo_count = len([d for d in os.listdir('repos') if os.path.isdir(os.path.join('repos', d))])
+    print(f"✅ Environment validated: {repo_count} repositories preserved")
+    return True
+
+
 def main():
-    """Main cleanup process."""
-    parser = argparse.ArgumentParser(description='SWE-bench Heavy Cleanup Tool')
-    parser.add_argument('--issues', nargs='+', help='Specific issue IDs to clean')
+    """Main cleanup process - SAFE test data cleanup only."""
+    parser = argparse.ArgumentParser(description='SWE-bench Heavy Safe Cleanup')
     parser.add_argument('--no-backup', action='store_true', help='Skip creating backup')
-    parser.add_argument('--keep-logs', action='store_true', help='Keep log directories')
     parser.add_argument('--status-only', action='store_true', help='Show status without cleaning')
     
     args = parser.parse_args()
 
-    print("SWE-bench Heavy Cleanup")
+    print("SWE-bench Heavy Safe Cleanup")
     print("="*50)
+    print("This script ONLY cleans test data:")
+    print("✅ PRESERVES: All scripts, docs, repos/, swe_bench_lite.jsonl")
+    print("🗑️  CLEANS: issues/, logs/, results/, runs/, state.json, progress.md")
+    print("="*50)
+
+    # Validate environment first
+    if not validate_environment():
+        print("❌ Environment validation failed - aborting for safety")
+        sys.exit(1)
 
     # Show current status
     show_current_status()
@@ -200,51 +227,38 @@ def main():
         return
 
     # Confirm cleanup
-    if not args.issues:
-        print("\n⚠️ This will reset the entire test environment!")
-        print("All progress will be lost unless backed up.")
-        confirm = input("Continue? (y/N): ").strip().lower()
-        if confirm != 'y':
-            print("Cleanup cancelled")
-            return
-    else:
-        print(f"\n⚠️ This will clean specific issues: {', '.join(args.issues)}")
-        confirm = input("Continue? (y/N): ").strip().lower()
-        if confirm != 'y':
-            print("Cleanup cancelled")
-            return
+    print(f"\n⚠️  This will reset test data for a fresh start.")
+    print("All production files will be preserved.")
+    confirm = input("Continue? (y/N): ").strip().lower()
+    if confirm != 'y':
+        print("Cleanup cancelled")
+        return
 
     # Create backup unless disabled
     backup_dir = None
     if not args.no_backup:
         backup_dir = backup_current_state()
 
-    # Perform cleanup
-    if args.issues:
-        # Clean specific issues
-        clean_issues_directory(args.issues)
-    else:
-        # Full cleanup
-        reset_state()
-        reset_progress()
-        clean_issues_directory()
-        if not args.keep_logs:
-            clean_logs()
+    # Perform SAFE cleanup (test data only)
+    reset_state()
+    reset_progress()
+    clean_test_directories()
+
+    # Final validation
+    if not validate_environment():
+        print("❌ CRITICAL: Environment corrupted during cleanup!")
+        sys.exit(1)
 
     print("\n" + "="*50)
-    print("CLEANUP COMPLETE")
+    print("✅ SAFE CLEANUP COMPLETE")
     print("="*50)
     
     if backup_dir:
         print(f"Backup saved to: {backup_dir}")
     
-    if args.issues:
-        print(f"Cleaned specific issues: {', '.join(args.issues)}")
-    else:
-        print("Test environment completely reset")
-
+    print("Test environment reset - all production files preserved")
     print("\nNext steps:")
-    print("1. Run 'python3 setup.py' if you need to reconfigure")
+    print("1. Run 'python3 setup.py' to configure test scope")
     print("2. Start testing with 'python3 get_next_issue.py'")
     print("3. For bots: 'read instructions.md and attempt completion when all issues are resolved'")
 

@@ -27,11 +27,11 @@ The benchmark provides a controlled environment with the following characteristi
 
 - **Pre-configured toolchain**: Git, Python, and necessary permissions
 - **Repository access**: Complete access to codebases and test specifications
-- **Automated tooling suite**:
-  - Issue selection and presentation
-  - Solution validation and testing
-  - Progress tracking and state management
-  - Incremental progress recording
+- **Enhanced automated tooling suite**:
+  - Issue selection and presentation with validation enforcement
+  - Solution validation and automatic progress recording
+  - Comprehensive attempt tracking per issue
+  - State management with detailed attempt history
   - Session resumption capabilities
 
 Additional infrastructure includes:
@@ -81,7 +81,7 @@ SWE-bench Heavy is designed for complete self-administration. Users configure th
 ## Constraints and Requirements
 
 1. **No tooling modifications**: Test infrastructure must remain unaltered
-2. **Session continuity**: Interruptions must resume within the same conversation context window for valid results
+2. **Session continuity**: Interruptions must resume within the same conversation context window for test results to be considered valid
 3. **Tool limitations**: Only filesystem, shell-command-server, and chosen context window management systems permitted
 4. **No auxiliary aids**: Inference aids are prohibited as they contradict the benchmark's core objectives
 

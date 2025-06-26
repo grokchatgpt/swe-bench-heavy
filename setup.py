@@ -175,11 +175,56 @@ def validate_dataset():
 
 def install_python_dependencies():
     """Install required Python packages with proper environment handling."""
-    packages = [
+    # Base packages for the benchmark
+    base_packages = [
         'pytest',
         'requests',
         'gitpython'
     ]
+    
+    # Repository-specific packages detected from dataset
+    repo_packages = {
+        'astropy': ['astropy', 'numpy', 'scipy', 'PyYAML'],
+        'scikit-learn': ['scikit-learn', 'numpy', 'scipy', 'pandas', 'joblib'],
+        'sympy': ['sympy', 'mpmath'],
+        'django': ['Django', 'psycopg2-binary', 'Pillow'],
+        'flask': ['Flask', 'Werkzeug', 'Jinja2', 'click'],
+        'requests': ['requests', 'urllib3', 'chardet', 'certifi'],
+        'matplotlib': ['matplotlib', 'numpy', 'cycler', 'kiwisolver'],
+        'pytest': ['pytest', 'pluggy', 'py'],
+        'sphinx': ['Sphinx', 'docutils', 'Pygments'],
+        'pandas': ['pandas', 'numpy', 'python-dateutil', 'pytz']
+    }
+    
+    # Auto-detect required packages from dataset
+    print("Auto-detecting required packages from dataset...")
+    required_packages = set(base_packages)
+    
+    try:
+        with open('swe_bench_lite.jsonl', 'r') as f:
+            repos_found = set()
+            for line in f:
+                if line.strip():
+                    issue = json.loads(line)
+                    repo_name = issue['repo'].split('/')[0]  # Get org name
+                    repo_full = issue['repo'].split('/')[1] if '/' in issue['repo'] else repo_name  # Get repo name
+                    repos_found.add(repo_name)
+                    repos_found.add(repo_full)
+            
+            print(f"Found repositories: {sorted(repos_found)}")
+            
+            # Add packages for detected repositories
+            for repo in repos_found:
+                if repo in repo_packages:
+                    required_packages.update(repo_packages[repo])
+                    print(f"Added packages for {repo}: {repo_packages[repo]}")
+    
+    except Exception as e:
+        print(f"Warning: Could not auto-detect packages: {e}")
+        print("Installing base packages only")
+    
+    packages = sorted(list(required_packages))
+    print(f"Installing {len(packages)} packages: {packages}")
     
     print("Installing Python dependencies...")
     
