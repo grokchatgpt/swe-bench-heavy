@@ -1,4 +1,4 @@
-# SWE-bench Heavy Installation Guide 
+# swe-bench-heavy Installation Guide 
 This guide will help you set up the SWE-bench Heavy benchmark for autonomous AI testing. 
 
 ## Prerequisites
@@ -14,8 +14,13 @@ This guide will help you set up the SWE-bench Heavy benchmark for autonomous AI 
 # Download the dataset (this will be automated in setup script)
 wget https://github.com/princeton-nlp/SWE-bench/releases/download/v1.0.0/swe_bench_lite.jsonl
 ``` 
-2. **Configure Test Parameters**: Edit `state.json` to configure your test run: ```json
-{ "test_config": { "mode": "ALL", // Options: "ALL", "SIZE", "RANGE" "total_issues": 300, // For SIZE mode: number of issues "dataset_file": "swe_bench_lite.jsonl", "start_index": 0, // For RANGE mode: start index "end_index": 299 // For RANGE mode: end index }
+2. **Configure Test Parameters**: Edit `state.json` to configure your test run: 
+```json
+{ "test_config": { "mode": "ALL", // Options: "ALL", "SIZE", 
+"RANGE" "total_issues": 300, // For SIZE mode: number of issues 
+"dataset_file": "swe_bench_lite.jsonl", 
+"start_index": 0, // For RANGE mode: start index 
+"end_index": 299 // For RANGE mode: end index }
 }
 ``` 
 
@@ -103,12 +108,15 @@ python cleanup.py --issues django__django-11964 flask__flask-1234
 
 Edit `state.json` to change test scope: 
 ```json
-{ "test_config": { "mode": "SIZE", "total_issues": 50, // Test first 50 issues only "dataset_file": "swe_bench_lite.jsonl" }
+{ "test_config": { "mode": "SIZE", "total_issues": 50, // Test first 50 issues only 
+"dataset_file": "swe_bench_lite.jsonl" }
 }
 ``` 
 
 ```json
-{ "test_config": { "mode": "RANGE", "start_index": 100, // Start from issue 100 "end_index": 149, // End at issue 149 (50 issues total) "dataset_file": "swe_bench_lite.jsonl" }
+{ "test_config": { "mode": "RANGE", "start_index": 100, // Start from issue 100 
+"end_index": 149, // End at issue 149 (50 issues total) 
+"dataset_file": "swe_bench_lite.jsonl" }
 }
 ``` 
 
@@ -139,7 +147,7 @@ PYTHONPATH=. python3 grading_fast.py <issue_id> # Add current dir to path
 - **Disk Space**: Each issue requires ~100-500MB for repository and test environment
 - **Memory**: Test execution may require 1-2GB RAM per issue
 - **Network**: Initial setup downloads ~1GB of repositories
-- **Time**: Full 300-issue run will take 48+ hours depending on bot performance 
+- **Time**: One time LONG clone time for all 300 
 
 ## Security Notes
 - Test environments are isolated in separate directories

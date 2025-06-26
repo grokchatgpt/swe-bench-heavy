@@ -1,4 +1,4 @@
-# SWE-bench Heavy Progress Log
+# swe-bench-heavy Progress Log
 
 ## Test Configuration
 - **Mode**: SIZE

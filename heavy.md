@@ -1,4 +1,4 @@
-# SWE-bench Heavy
+# swe-bench-heavy
 
 ## Objective
 

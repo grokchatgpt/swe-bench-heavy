@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SWE-bench Heavy: Get Next Issue Tool
+swe-bench-heavy: Get Next Issue Tool
 Selects the next issue for the bot to work on based on current state and strategy.
 """
 import json

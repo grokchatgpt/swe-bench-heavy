@@ -1,4 +1,4 @@
-# SWE-bench Heavy Instructions
+# swe-bench-heavy Instructions
 
 You are an autonomous AI coder tasked with solving GitHub issues from the SWE-bench Lite dataset. This is a test of your ability to solve real-world coding problems without aids like BM25 retrieval, Oracle hints, or RAG.
 
