@@ -1,4 +1,7 @@
-# SWE-bench Heavy Installation Guide This guide will help you set up the SWE-bench Heavy benchmark for autonomous AI testing. ## Prerequisites
+# SWE-bench Heavy Installation Guide 
+This guide will help you set up the SWE-bench Heavy benchmark for autonomous AI testing. 
+
+## Prerequisites
 - Python 3.8+
 - Git
 - pip
@@ -27,7 +30,8 @@ python record_progress.py test_issue SKIP "Testing setup" # Should update progre
 ``` 
 
 ## Directory Structure
-After setup, your directory will look like: ``` test/
+After setup, your directory will look like: 
+``` test/
 ├── heavy.md # Benchmark description
 ├── instructions.md # Bot instructions
 ├── install.md # This file
@@ -65,7 +69,8 @@ read instructions.md and attempt completion when all issues are resolved
 python get_next_issue.py
 ``` 
 2. **Work on the issue** in the `runs/<issue_id>/` directory (automatically copied from pre-downloaded repos)
-3. **Test your solution**: ```bash
+3. **Test your solution**: 
+```bash
 python3 grading_fast.py <issue_id>
 ```
 4. **Record progress**: 
@@ -111,7 +116,9 @@ Edit `state.json` to change test scope:
 To use a different dataset: 
 1. Place your `.jsonl` file in the test directory
 2. Update `dataset_file` in `state.json`
-3. Ensure your dataset follows SWE-bench format ## Troubleshooting
+3. Ensure your dataset follows SWE-bench format 
+
+## Troubleshooting
 
 ### Common Issues
 1. **"Dataset not found"**: Run the setup script to download `swe_bench_lite.jsonl` 2. **"Git clone failed"**: Check internet connection and GitHub access 
