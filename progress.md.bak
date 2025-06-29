@@ -1,0 +1,47 @@
+# SWE-bench Heavy Progress Log
+
+## Test Configuration
+- **Mode**: RANGE
+- **Dataset**: swe_bench_lite.jsonl
+- **Issue Range**: Index 0 to 24 (inclusive)
+- **Total Issues in Range**: 25
+- **Session Started**: 2025-06-28 20:15:49
+- **Session Duration**: 539.8 minutes
+- **Status**: Active Testing
+
+## Current Statistics (Per-Issue Tracking)
+- **Unique Issues Attempted**: 25/25
+- **Total Attempts**: 99
+- **Issues Passed**: 25
+- **Issues Failed**: 45
+- **Issues Skipped**: 9
+- **Success Rate**: 100.0%
+- **Avg Attempts per Issue**: 3.96
+
+## Overall Statistics (Aggregated Across All Issues)
+- **Total Issues Processed**: 25
+- **Overall Success Rate**: 100.0%
+- **First Attempt Success Rate**: 28.0%
+- **Retry Success Rate**: 72.2%
+- **Max Attempts on Single Issue**: 25
+- **Avg Time per Successful Issue**: 27.1 minutes
+- **Fastest Solve**: 0.0 minutes
+- **Slowest Solve**: 484.7 minutes
+
+## Recent Activity
+**2025-06-29 05:15:38**: mwaskom__seaborn-2848 - PASS (Passed Docker grading tests (official SWE-Bench compliant))
+
+## Current Issue Details
+### mwaskom__seaborn-2848 - PASS
+- **Timestamp**: 2025-06-29 05:15:38
+- **Status**: PASS
+- **Attempt**: #25
+- **Time on Issue**: 484.7 minutes
+- **Notes**: Passed Docker grading tests (official SWE-Bench compliant)
+
+
+## Notes
+- Enhanced stats tracking with per-issue and overall statistics
+- Individual attempt tracking per issue implemented
+- Automatic progress updates and backup system active
+- Session management and timing tracking active

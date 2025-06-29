@@ -1,0 +1,21 @@
+{
+  "docker_timeout": 300,
+  "max_attempts": 30,
+  "issue_selection": "0,2,7,16,120,125,143,144,147,149,150,154,156,160,161,166,169,183,184,206,207,222,223,247,299",
+  "description": "25-Issue Gauntlet - 2 per repo + 1 random last issue",
+  "strategy": "Designed to expose breaking point",
+  "repos": [
+    "astropy/astropy",
+    "django/django",
+    "matplotlib/matplotlib",
+    "mwaskom/seaborn",
+    "pallets/flask",
+    "psf/requests",
+    "pytest-dev/pytest",
+    "scikit-learn/scikit-learn",
+    "sphinx-doc/sphinx",
+    "sympy/sympy",
+    "xarray-contrib/xarray",
+    "pylint-dev/pylint"
+  ]
+}

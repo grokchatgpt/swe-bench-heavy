@@ -1,156 +1,211 @@
-# swe-bench-heavy Installation Guide 
-This guide will help you set up the SWE-bench Heavy benchmark for autonomous AI testing. 
+lean# SWE-Bench Heavy: Installation Guide
 
 ## Prerequisites
-- Python 3.8+
-- Git
-- pip
-- rsync (for file copying)
-- Internet connection (for downloading dataset and repositories) 
 
-## Quick Setup
-1. **Download SWE-bench Lite Dataset**: 
+### 1. Docker
+**Required**: Docker Desktop or Docker Engine
+
+#### macOS
 ```bash
-# Download the dataset (this will be automated in setup script)
-wget https://github.com/princeton-nlp/SWE-bench/releases/download/v1.0.0/swe_bench_lite.jsonl
-``` 
-2. **Configure Test Parameters**: Edit `state.json` to configure your test run: 
-```json
-{ "test_config": { "mode": "ALL", // Options: "ALL", "SIZE", 
-"RANGE" "total_issues": 300, // For SIZE mode: number of issues 
-"dataset_file": "swe_bench_lite.jsonl", 
-"start_index": 0, // For RANGE mode: start index 
-"end_index": 299 // For RANGE mode: end index }
-}
-``` 
-
-**Test Modes**: - `ALL`: Test all 300 issues in the dataset
-- `SIZE`: Test first N issues (set `total_issues`)
-- `RANGE`: Test issues from index M to N (set `start_index` and `end_index`) 3. Inclusive and 0 indexed.
-
-**Verify Setup**: 
-```bash
-python get_next_issue.py # Should show first issue
-python record_progress.py test_issue SKIP "Testing setup" # Should update progress
-``` 
-
-## Directory Structure
-After setup, your directory will look like: 
-``` test/
-├── heavy.md # Benchmark description
-├── instructions.md # Bot instructions
-├── install.md # This file
-├── state.json # Test state and configuration
-├── progress.md # Human-readable progress log
-├── get_next_issue.py # Issue selection tool
-├── record_progress.py # Progress recording tool
-├── grading_fast.py # Fast solution testing tool
-├── setup.py # Automated setup script
-├── cleanup.py # Reset script
-├── swe_bench_lite.jsonl # Dataset (downloaded)
-├── repos/ # Pre-downloaded repositories (pristine)
-│ └── <issue_id>/
-│     └── repo/ # Original repository at base commit
-├── runs/ # Working directories (copies for modifications)
-│ └── <issue_id>/ # Your workspace for each issue
-└── issues/ # Issue-specific metadata and results
-    └── <issue_id>/
-        ├── issue.json # Issue details
-        ├── test_env/ # Isolated test environment
-        ├── test_results.json # Test results
-        └── test_output.txt # Test output
-``` 
-## Running the Benchmark
-
-### For Bots (Autonomous)
-Tell your bot: 
+# Install Docker Desktop
+brew install --cask docker
+# Or download from: https://www.docker.com/products/docker-desktop/
 ```
-read instructions.md and attempt completion when all issues are resolved
-``` 
 
-### For Humans (Manual Testing)
-1. **Get next issue**: 
+#### Linux (Ubuntu/Debian)
 ```bash
-python get_next_issue.py
-``` 
-2. **Work on the issue** in the `runs/<issue_id>/` directory (automatically copied from pre-downloaded repos)
-3. **Test your solution**: 
-```bash
-python3 grading_fast.py <issue_id>
+# Install Docker Engine
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Add user to docker group (logout/login required)
+sudo usermod -aG docker $USER
 ```
-4. **Record progress**: 
+
+#### Windows
+Download Docker Desktop from: https://www.docker.com/products/docker-desktop/
+
+### 2. Python 3.8+
 ```bash
-python record_progress.py <issue_id> PASS "Fixed the bug"
-python record_progress.py <issue_id> FAIL "Need more investigation"
-python record_progress.py <issue_id> SKIP "Too complex for now"
-python record_progress.py <issue_id> RETRY "Will try again later"
-``` 
+# Check Python version
+python3 --version
 
-## Resumption
-The benchmark is designed for seamless resumption: 
-- **State**: Tracked in `state.json`
-- **Progress**: Human-readable log in `progress.md`
-- **Issue Status**: Each issue maintains its own state If interrupted, simply restart with the same command. The system will continue where it left off. 
+# Install if needed (macOS)
+brew install python3
 
-## Cleanup and Reset
-To reset for a new test run: 
+# Install if needed (Ubuntu/Debian)
+sudo apt update && sudo apt install python3 python3-pip
+```
+
+### 3. Git
 ```bash
-python cleanup.py # Removes all issue directories and resets state
-``` 
-To clean specific issues: 
+# Check Git
+git --version
+
+# Install if needed (macOS)
+brew install git
+
+# Install if needed (Ubuntu/Debian)
+sudo apt install git
+```
+
+## Installation
+
+### 1. Clone Repository
 ```bash
-python cleanup.py --issues django__django-11964 flask__flask-1234
-``` 
+git clone <your-repo-url>
+cd swe-bench-heavy
+```
 
-## Configuration Options
+### 2. One-Step Setup
+```bash
+python3 setup.py
+```
 
-### Test Scope
+This automatically:
+- ✅ Verifies Docker is working
+- ✅ Downloads SWE-Bench Lite dataset (300 issues)
+- ✅ Creates directory structure
+- ✅ Cleans legacy files
+- ✅ Configures Docker environment
+- ✅ Creates default config.json
 
-Edit `state.json` to change test scope: 
-```json
-{ "test_config": { "mode": "SIZE", "total_issues": 50, // Test first 50 issues only 
-"dataset_file": "swe_bench_lite.jsonl" }
-}
-``` 
+### 3. Verify Installation
+```bash
+# Check Docker images (should show SWE-Bench images)
+docker images | grep swe-
 
-```json
-{ "test_config": { "mode": "RANGE", "start_index": 100, // Start from issue 100 
-"end_index": 149, // End at issue 149 (50 issues total) 
-"dataset_file": "swe_bench_lite.jsonl" }
-}
-``` 
+# Test with a simple issue
+python3 grading_docker.py sympy__sympy-11400
+```
 
-### Custom Dataset
-To use a different dataset: 
-1. Place your `.jsonl` file in the test directory
-2. Update `dataset_file` in `state.json`
-3. Ensure your dataset follows SWE-bench format 
+## System Requirements
+
+### Minimum
+- **CPU**: 2 cores
+- **RAM**: 8GB
+- **Disk**: 50GB free space
+- **Network**: Stable internet for Docker pulls
+
+### Recommended
+- **CPU**: 4+ cores
+- **RAM**: 16GB+
+- **Disk**: 100GB+ SSD
+- **Network**: Fast internet (Docker images are large)
+
+## Docker Storage
+
+### Expected Usage
+- **Base images**: ~20GB (12 repositories)
+- **Build cache**: ~10GB
+- **Test results**: ~1GB
+- **Total**: ~30-40GB
+
+### Cleanup Commands
+```bash
+# Remove unused containers
+docker container prune -f
+
+# Remove unused images
+docker image prune -f
+
+# Remove everything (nuclear option)
+docker system prune -a -f
+```
 
 ## Troubleshooting
 
-### Common Issues
-1. **"Dataset not found"**: Run the setup script to download `swe_bench_lite.jsonl` 2. **"Git clone failed"**: Check internet connection and GitHub access 
-3. **"Test execution failed"**: Ensure Python dependencies are installed 
-4. **"Permission denied"**: Make sure scripts are executable: 
+### Docker Permission Issues (Linux)
 ```bash
-chmod +x *.py
-``` 
+# Add user to docker group
+sudo usermod -aG docker $USER
 
-### Debug Mode
-Add debug output to any script: 
+# Logout and login again, then test
+docker run hello-world
+```
+
+### Docker Desktop Not Starting (macOS/Windows)
+1. Restart Docker Desktop
+2. Check system resources (RAM/disk)
+3. Reset Docker Desktop to factory defaults
+
+### Network Issues
 ```bash
-python -u get_next_issue.py # Unbuffered output
-PYTHONPATH=. python3 grading_fast.py <issue_id> # Add current dir to path
-``` 
+# Test Docker Hub connectivity
+docker pull hello-world
 
-## Performance Notes
-- **Disk Space**: Each issue requires ~100-500MB for repository and test environment
-- **Memory**: Test execution may require 1-2GB RAM per issue
-- **Network**: Initial setup downloads ~1GB of repositories
-- **Time**: One time LONG clone time for all 300 
+# Check DNS resolution
+nslookup registry-1.docker.io
+```
+
+### Disk Space Issues
+```bash
+# Check Docker disk usage
+docker system df
+
+# Clean up aggressively
+docker system prune -a -f --volumes
+```
+
+### Python Issues
+```bash
+# Install required packages
+pip3 install requests
+
+# Check Python path
+which python3
+```
+
+## Performance Tuning
+
+### Docker Settings
+- **Memory**: Allocate 8GB+ to Docker
+- **CPU**: Use all available cores
+- **Disk**: Use SSD if possible
+
+### Build Optimization
+```bash
+# Parallel builds (if supported)
+export DOCKER_BUILDKIT=1
+
+# Use build cache
+docker builder prune --keep-storage 10GB
+```
 
 ## Security Notes
-- Test environments are isolated in separate directories
-- No network access during test execution (after initial setup)
-- All repositories are cloned to specific commits (no latest code)
-- Test patches are applied in isolated environments This benchmark is designed to be completely self-contained and autonomous. No human intervention should be required during execution.
+
+### Docker Security
+- Images are pulled from official SWE-Bench registry
+- Containers run in isolated environments
+- No privileged access required
+
+### Network Security
+- Only outbound connections needed
+- No incoming ports opened
+- Safe for corporate networks
+
+## Getting Help
+
+### Common Issues
+1. **"Docker not found"** → Install Docker and restart terminal
+2. **"Permission denied"** → Add user to docker group (Linux)
+3. **"No space left"** → Clean Docker cache or add disk space
+4. **"Build failed"** → Check network and try again
+
+### Debug Commands
+```bash
+# Check Docker status
+docker info
+
+# Check system resources
+df -h
+free -h
+
+# Check network
+ping google.com
+```
+
+### Support
+- Check `instructions.md` for usage
+- Review Docker logs: `docker logs <container_id>`
+- File issues with full error output

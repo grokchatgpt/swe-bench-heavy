@@ -1,0 +1,594 @@
+{
+  "test_config": {
+    "mode": "RANGE",
+    "total_issues": 25,
+    "dataset_file": "swe_bench_lite.jsonl",
+    "start_index": 0,
+    "end_index": 24
+  },
+  "current_state": {
+    "current_issue_index": 0,
+    "issues_attempted": 17,
+    "issues_passed": 11,
+    "issues_failed": 19,
+    "issues_skipped": 1,
+    "last_activity": "2025-06-28T14:14:17.507999",
+    "session_start": "2025-06-28T11:56:39.822420",
+    "total_attempts": 32,
+    "unique_issues_attempted": 17,
+    "avg_attempts_per_issue": 1.88,
+    "session_duration_minutes": 137.6
+  },
+  "issue_status": {
+    "astropy__astropy-12907": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T11:56:39.822420",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "astropy__astropy-14365": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:15:24.784530",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "django__django-10924": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:19:14.058078",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "django__django-11422": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:22:29.104803",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "matplotlib__matplotlib-18869": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:27:02.937880",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "matplotlib__matplotlib-23476": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:32:54.340610",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "mwaskom__seaborn-2848": {
+      "status": "FAIL",
+      "timestamp": "2025-06-28T12:41:29.459498",
+      "notes": "Failed Docker tests: FAILED tests/test_relational.py::TestRelationalPlotter::test_relplot_simple..."
+    },
+    "mwaskom__seaborn-3010": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T12:48:43.095718",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "pallets__flask-4045": {
+      "status": "FAIL",
+      "timestamp": "2025-06-28T12:55:08.744140",
+      "notes": "Failed Docker tests: ERROR tests/test_basic.py::test_flashes - DeprecationWarning: 'werkzeug.urls......."
+    },
+    "pallets__flask-5063": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T13:03:56.610612",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "psf__requests-1963": {
+      "status": "FAIL",
+      "timestamp": "2025-06-28T13:12:11.729579",
+      "notes": "Failed Docker tests: FAILED test_requests.py::RequestsTestCase::test_conflicting_post_params - Typ......"
+    },
+    "psf__requests-3362": {
+      "status": "SKIP",
+      "timestamp": "2025-06-28T13:29:45.025141",
+      "notes": "Fix is correct - test_response_decode_unicode PASSED, but test environment has network connectivity issues causing unrelated test failures"
+    },
+    "pydata__xarray-3364": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T13:34:16.170614",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "pydata__xarray-5131": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T13:42:00.367444",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "pylint-dev__pylint-5859": {
+      "status": "PASS",
+      "timestamp": "2025-06-28T13:53:10.765843",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "pylint-dev__pylint-7993": {
+      "status": "FAIL",
+      "timestamp": "2025-06-28T14:05:49.123899",
+      "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_parseable_output_regression..."
+    },
+    "pytest-dev__pytest-5103": {
+      "status": "FAIL",
+      "timestamp": "2025-06-28T14:14:17.507999",
+      "notes": "Failed Docker grading tests (official SWE-Bench compliant)"
+    }
+  },
+  "failed_issues": [
+    "mwaskom__seaborn-2848",
+    "pallets__flask-4045",
+    "psf__requests-1963",
+    "pylint-dev__pylint-7993",
+    "pytest-dev__pytest-5103"
+  ],
+  "skipped_issues": [
+    "psf__requests-3362"
+  ],
+  "completed_issues": [
+    "astropy__astropy-12907",
+    "astropy__astropy-14365",
+    "django__django-10924",
+    "django__django-11422",
+    "matplotlib__matplotlib-18869",
+    "matplotlib__matplotlib-23476",
+    "mwaskom__seaborn-3010",
+    "pallets__flask-5063",
+    "pydata__xarray-3364",
+    "pydata__xarray-5131",
+    "pylint-dev__pylint-5859"
+  ],
+  "retry_queue": [],
+  "issue_attempts": {
+    "astropy__astropy-12907": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T11:56:39.822420",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T11:56:39.822420",
+      "last_attempt": "2025-06-28T11:56:39.822420",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "astropy__astropy-14365": {
+      "attempt_count": 6,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T11:58:18.586971",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_roundtrip[True] FAILED..."
+        },
+        {
+          "attempt": 2,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:03:03.226557",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_get_tables_from_qdp_file FAILED..."
+        },
+        {
+          "attempt": 3,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:04:12.142713",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_get_tables_from_qdp_file FAILED..."
+        },
+        {
+          "attempt": 4,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:05:10.950586",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_get_tables_from_qdp_file FAILED..."
+        },
+        {
+          "attempt": 5,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:10:46.496635",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_roundtrip[True] FAILED..."
+        },
+        {
+          "attempt": 6,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:15:24.784530",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T11:58:18.586971",
+      "last_attempt": "2025-06-28T12:15:24.784530",
+      "total_time_minutes": 17.1,
+      "time_to_success": 17.1,
+      "first_attempt_success": false,
+      "final_status": "PASS"
+    },
+    "django__django-10924": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:19:14.058078",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T12:19:14.058078",
+      "last_attempt": "2025-06-28T12:19:14.058078",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "django__django-11422": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:22:29.104803",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T12:22:29.104803",
+      "last_attempt": "2025-06-28T12:22:29.104803",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "matplotlib__matplotlib-18869": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:27:02.937880",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T12:27:02.937880",
+      "last_attempt": "2025-06-28T12:27:02.937880",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "matplotlib__matplotlib-23476": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:32:54.340610",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T12:32:54.340610",
+      "last_attempt": "2025-06-28T12:32:54.340610",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "mwaskom__seaborn-2848": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:41:29.459498",
+          "notes": "Failed Docker tests: FAILED tests/test_relational.py::TestRelationalPlotter::test_relplot_simple..."
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-06-28T12:41:29.459498",
+      "last_attempt": "2025-06-28T12:41:29.459498",
+      "total_time_minutes": 0.0,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    },
+    "mwaskom__seaborn-3010": {
+      "attempt_count": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:46:53.338511",
+          "notes": "Failed Docker tests: tests/_stats/test_regression.py:53: AssertionError..."
+        },
+        {
+          "attempt": 2,
+          "status": "PASS",
+          "timestamp": "2025-06-28T12:48:43.095718",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T12:46:53.338511",
+      "last_attempt": "2025-06-28T12:48:43.095718",
+      "total_time_minutes": 1.8,
+      "time_to_success": 1.8,
+      "first_attempt_success": false,
+      "final_status": "PASS"
+    },
+    "pallets__flask-4045": {
+      "attempt_count": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:52:45.783929",
+          "notes": "Failed Docker grading tests (official SWE-Bench compliant)"
+        },
+        {
+          "attempt": 2,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T12:55:08.744140",
+          "notes": "Failed Docker tests: ERROR tests/test_basic.py::test_flashes - DeprecationWarning: 'werkzeug.urls......."
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-06-28T12:52:45.783929",
+      "last_attempt": "2025-06-28T12:55:08.744140",
+      "total_time_minutes": 2.4,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    },
+    "pallets__flask-5063": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T13:03:56.610612",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T13:03:56.610612",
+      "last_attempt": "2025-06-28T13:03:56.610612",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "psf__requests-1963": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:12:11.729579",
+          "notes": "Failed Docker tests: FAILED test_requests.py::RequestsTestCase::test_conflicting_post_params - Typ......"
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-06-28T13:12:11.729579",
+      "last_attempt": "2025-06-28T13:12:11.729579",
+      "total_time_minutes": 0.0,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    },
+    "psf__requests-3362": {
+      "attempt_count": 2,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:19:35.042904",
+          "notes": "Failed Docker tests: ERROR tests/test_requests.py::TestRequests::test_no_content_length[GET]..."
+        },
+        {
+          "attempt": 2,
+          "status": "SKIP",
+          "timestamp": "2025-06-28T13:29:45.025116",
+          "notes": "Fix is correct - test_response_decode_unicode PASSED, but test environment has network connectivity issues causing unrelated test failures"
+        }
+      ],
+      "current_status": "SKIP",
+      "first_attempt": "2025-06-28T13:19:35.042904",
+      "last_attempt": "2025-06-28T13:19:35.042904",
+      "total_time_minutes": 0.0,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    },
+    "pydata__xarray-3364": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T13:34:16.170614",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T13:34:16.170614",
+      "last_attempt": "2025-06-28T13:34:16.170614",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "pydata__xarray-5131": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "PASS",
+          "timestamp": "2025-06-28T13:42:00.367444",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T13:42:00.367444",
+      "last_attempt": "2025-06-28T13:42:00.367444",
+      "total_time_minutes": 0.0,
+      "time_to_success": 0.0,
+      "first_attempt_success": true,
+      "final_status": "PASS"
+    },
+    "pylint-dev__pylint-5859": {
+      "attempt_count": 3,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:45:50.255755",
+          "notes": "Failed Docker tests: FAILED tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message - ......"
+        },
+        {
+          "attempt": 2,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:51:58.748692",
+          "notes": "Failed Docker tests: FAILED tests/checkers/unittest_misc.py::TestFixme::test_fixme_with_message - ......"
+        },
+        {
+          "attempt": 3,
+          "status": "PASS",
+          "timestamp": "2025-06-28T13:53:10.765843",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-06-28T13:45:50.255755",
+      "last_attempt": "2025-06-28T13:53:10.765843",
+      "total_time_minutes": 7.3,
+      "time_to_success": 7.3,
+      "first_attempt_success": false,
+      "final_status": "PASS"
+    },
+    "pylint-dev__pylint-7993": {
+      "attempt_count": 6,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:54:54.765581",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_template_option_with_header..."
+        },
+        {
+          "attempt": 2,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T13:59:00.190650",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_template_option - Attribut......"
+        },
+        {
+          "attempt": 3,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T14:01:11.191431",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_parseable_output_deprecated..."
+        },
+        {
+          "attempt": 4,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T14:03:02.882879",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_parseable_output_deprecated..."
+        },
+        {
+          "attempt": 5,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T14:04:41.348534",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_parseable_output_regression..."
+        },
+        {
+          "attempt": 6,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T14:05:49.123899",
+          "notes": "Failed Docker tests: FAILED tests/reporters/unittest_reporting.py::test_parseable_output_regression..."
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-06-28T13:54:54.765581",
+      "last_attempt": "2025-06-28T14:05:49.123899",
+      "total_time_minutes": 10.9,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    },
+    "pytest-dev__pytest-5103": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-06-28T14:14:17.507999",
+          "notes": "Failed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-06-28T14:14:17.507999",
+      "last_attempt": "2025-06-28T14:14:17.507999",
+      "total_time_minutes": 0.0,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    }
+  },
+  "overall_stats": {
+    "total_issues_processed": 17,
+    "total_attempts_across_all_issues": 32,
+    "total_passes": 11,
+    "total_fails": 5,
+    "total_skips": 1,
+    "overall_success_rate": 64.7,
+    "avg_attempts_per_issue": 1.88,
+    "first_attempt_success_count": 8,
+    "first_attempt_success_rate": 47.1,
+    "retry_success_count": 3,
+    "retry_success_rate": 33.3,
+    "max_attempts_on_single_issue": 6,
+    "min_attempts_on_single_issue": 1,
+    "fastest_solve_minutes": 0.0,
+    "slowest_solve_minutes": 17.1,
+    "avg_time_per_successful_issue": 2.4,
+    "total_time_on_successful_issues": 26.2,
+    "issues_solved_first_attempt": [
+      "astropy__astropy-12907",
+      "django__django-10924",
+      "django__django-11422",
+      "matplotlib__matplotlib-18869",
+      "matplotlib__matplotlib-23476",
+      "pallets__flask-5063",
+      "pydata__xarray-3364",
+      "pydata__xarray-5131"
+    ],
+    "issues_requiring_retries": [
+      "astropy__astropy-14365",
+      "mwaskom__seaborn-3010",
+      "pylint-dev__pylint-5859"
+    ],
+    "most_difficult_issues": [
+      {
+        "issue_id": "astropy__astropy-14365",
+        "attempts": 6,
+        "status": "PASS"
+      },
+      {
+        "issue_id": "pylint-dev__pylint-7993",
+        "attempts": 6,
+        "status": "FAIL"
+      },
+      {
+        "issue_id": "pylint-dev__pylint-5859",
+        "attempts": 3,
+        "status": "PASS"
+      },
+      {
+        "issue_id": "mwaskom__seaborn-3010",
+        "attempts": 2,
+        "status": "PASS"
+      },
+      {
+        "issue_id": "pallets__flask-4045",
+        "attempts": 2,
+        "status": "FAIL"
+      }
+    ]
+  },
+  "current_issue_index": 169,
+  "last_updated": "2025-06-28T14:14:17.508946"
+}

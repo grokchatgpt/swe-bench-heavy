@@ -1,436 +1,363 @@
 #!/usr/bin/env python3
 """
-SWE-bench Heavy: Automated Setup Script
-Downloads dataset and prepares the test environment.
+SWE-Bench Heavy: Automated Setup
+Bulletproof initialization that preserves all valuable assets.
+Only cleans run data, never touches repos or Docker images.
+
+Usage: python3 setup.py
 """
-import json
 import os
 import subprocess
 import sys
-import urllib.request
-from pathlib import Path
+import json
 
+def run_cmd(cmd, check=True, capture=False):
+    """Run command with proper error handling."""
+    print(f"🔧 {cmd}")
+    result = subprocess.run(cmd, shell=True, capture_output=capture, text=True)
+    if check and result.returncode != 0:
+        print(f"❌ Command failed: {cmd}")
+        if capture:
+            print(f"Error: {result.stderr}")
+        sys.exit(1)
+    return result
 
-def download_dataset():
-    """Download SWE-bench Lite dataset."""
-    dataset_file = "swe_bench_lite.jsonl"
+def clean_run_data():
+    """Clean only run data for fresh testing - preserves all valuable assets."""
+    print("🧹 Cleaning run data for fresh start...")
     
-    if os.path.exists(dataset_file):
-        print(f"✅ Dataset {dataset_file} already exists")
-        return True
+    import shutil
+    import time
     
-    # Try to copy from SWE-bench directory if it exists
-    swe_bench_path = "SWE-bench/data/swe_bench_lite.jsonl"
-    if os.path.exists(swe_bench_path):
-        print(f"Found dataset in SWE-bench directory, copying...")
+    # Only clean these directories - they contain test runs, not valuable assets
+    clean_dirs = ['runs', 'docker_results']
+    
+    for dir_name in clean_dirs:
+        if os.path.exists(dir_name):
+            # Count items before cleanup
+            try:
+                items_before = len(os.listdir(dir_name))
+                print(f"  Found {items_before} items in {dir_name}/")
+            except:
+                items_before = 0
+            
+            # Attempt cleanup with retry
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    shutil.rmtree(dir_name)
+                    print(f"  Cleaned: {dir_name}/ (attempt {attempt + 1})")
+                    break
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        print(f"  ❌ Failed to clean {dir_name} after {max_retries} attempts: {e}")
+                        print(f"  🔧 Trying alternative cleanup method...")
+                        
+                        # Alternative: remove contents individually
+                        try:
+                            for item in os.listdir(dir_name):
+                                item_path = os.path.join(dir_name, item)
+                                if os.path.isdir(item_path):
+                                    shutil.rmtree(item_path)
+                                else:
+                                    os.remove(item_path)
+                            print(f"  ✅ Alternative cleanup successful for {dir_name}/")
+                        except Exception as e2:
+                            print(f"  ❌ Alternative cleanup also failed: {e2}")
+                            sys.exit(1)
+                    else:
+                        print(f"  ⚠️ Cleanup attempt {attempt + 1} failed, retrying...")
+                        time.sleep(0.5)
+        
+        # Recreate empty directory
+        os.makedirs(dir_name, exist_ok=True)
+        
+        # Verify cleanup was successful
         try:
-            import shutil
-            shutil.copy2(swe_bench_path, dataset_file)
-            print(f"✅ Dataset copied successfully: {dataset_file}")
-            return True
-        except Exception as e:
-            print(f"ERROR: Failed to copy dataset: {e}")
-    
-    # Try multiple download URLs
-    dataset_urls = [
-        "https://github.com/princeton-nlp/SWE-bench/raw/main/data/swe_bench_lite.jsonl",
-        "https://raw.githubusercontent.com/princeton-nlp/SWE-bench/main/data/swe_bench_lite.jsonl",
-        "https://github.com/princeton-nlp/SWE-bench/releases/download/v1.0.0/swe_bench_lite.jsonl"
-    ]
-    
-    for dataset_url in dataset_urls:
-        print(f"Trying to download from {dataset_url}...")
-        try:
-            urllib.request.urlretrieve(dataset_url, dataset_file)
-            print(f"✅ Dataset downloaded successfully: {dataset_file}")
-            return True
-        except Exception as e:
-            print(f"Failed: {e}")
-            continue
-    
-    print("ERROR: Could not download dataset from any source.")
-    print("Please manually download swe_bench_lite.jsonl and place it in this directory.")
-    print("You can find it at: https://github.com/princeton-nlp/SWE-bench")
-    return False
+            items_after = len(os.listdir(dir_name))
+            if items_after == 0:
+                print(f"  ✅ Created clean {dir_name}/")
+            else:
+                print(f"  ❌ WARNING: {dir_name}/ still contains {items_after} items!")
+                print(f"  Items: {os.listdir(dir_name)}")
+        except:
+            print(f"  ✅ Created {dir_name}/")
 
-
-def verify_prerequisites():
-    """Check that required tools are available."""
-    required_tools = ['git', 'rsync']
-    python_tools = ['python3', 'pip3']
+def reset_state_files():
+    """Reset state tracking files for fresh start with .bak backups for A/B testing."""
+    print("🔄 Resetting state tracking with .bak backups...")
     
-    # Check for python3 and pip3 specifically
-    missing_tools = []
+    # Create .bak versions of existing files for A/B testing
+    backup_files = ['state.json', 'progress.md']
+    for filename in backup_files:
+        if os.path.exists(filename):
+            backup_name = f"{filename}.bak"
+            try:
+                import shutil
+                shutil.copy2(filename, backup_name)
+                print(f"  📋 Backed up: {filename} -> {backup_name}")
+            except Exception as e:
+                print(f"  ⚠️ Could not backup {filename}: {e}")
     
-    # Check standard tools
-    for tool in required_tools:
-        try:
-            subprocess.run([tool, '--version'], capture_output=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            missing_tools.append(tool)
-    
-    # Check Python tools specifically
-    for tool in python_tools:
-        try:
-            subprocess.run([tool, '--version'], capture_output=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            missing_tools.append(tool)
-    
-    if missing_tools:
-        print("ERROR: Missing required tools:")
-        for tool in missing_tools:
-            print(f"- {tool}")
-        print("\nPlease install missing tools and run setup again.")
-        return False
-    
-    print("✅ All required tools are available")
-    return True
-
-
-def create_directories():
-    """Create necessary directories."""
-    directories = [
-        'issues',
-        'logs',
-        'results'
-    ]
-    
-    for directory in directories:
-        os.makedirs(directory, exist_ok=True)
-        print(f"Created directory: {directory}")
-
-
-def make_scripts_executable():
-    """Make Python scripts executable."""
-    scripts = [
-        'get_next_issue.py',
-        'record_progress.py',
-        'grading_fast.py',
-        'setup.py',
-        'cleanup.py'
-    ]
-    
-    for script in scripts:
-        if os.path.exists(script):
-            os.chmod(script, 0o755)
-            print(f"Made executable: {script}")
-
-
-def validate_dataset():
-    """Validate the downloaded dataset."""
-    dataset_file = "swe_bench_lite.jsonl"
-    
-    if not os.path.exists(dataset_file):
-        print(f"ERROR: Dataset file {dataset_file} not found")
-        return False
+    # Calculate total issues from config
+    total_issues = 300  # Default fallback
+    issue_selection = "0-299"  # Default fallback
     
     try:
-        issue_count = 0
-        issue_ids = []
-        
-        with open(dataset_file, 'r') as f:
-            for line in f:
-                if line.strip():
-                    issue = json.loads(line)
-                    
-                    # Validate required fields
-                    required_fields = ['instance_id', 'repo', 'base_commit', 'problem_statement']
-                    for field in required_fields:
-                        if field not in issue:
-                            print(f"ERROR: Missing required field '{field}' in dataset")
-                            return False
-                    
-                    issue_ids.append(issue['instance_id'])
-                    issue_count += 1
-        
-        print(f"✅ Dataset validated: {issue_count} issues found")
-        
-        # Validate that all repos are pre-downloaded
-        print("Validating pre-downloaded repositories...")
-        missing_repos = []
-        
-        for issue_id in issue_ids:
-            repo_path = f"repos/{issue_id}"
-            if not os.path.exists(repo_path):
-                missing_repos.append(issue_id)
-            elif not os.path.exists(f"{repo_path}/repo"):
-                missing_repos.append(f"{issue_id} (missing repo/ directory)")
-        
-        if missing_repos:
-            print(f"ERROR: Missing {len(missing_repos)} repositories:")
-            for repo in missing_repos[:10]:  # Show first 10
-                print(f"- {repo}")
-            if len(missing_repos) > 10:
-                print(f"... and {len(missing_repos) - 10} more")
-            print("\nPlease ensure all repositories are downloaded to repos/ directory")
-            return False
-        
-        print(f"✅ All {issue_count} repositories are present in repos/ directory")
-        return True
-        
+        if os.path.exists('config.json'):
+            with open('config.json', 'r') as f:
+                config = json.load(f)
+                issue_selection = config.get('issue_selection', '0-299')
+                
+                # Parse issue selection to get total count
+                if '-' in issue_selection:
+                    start, end = map(int, issue_selection.split('-'))
+                    total_issues = end - start + 1
+                else:
+                    # Handle single issue or comma-separated list
+                    issues = issue_selection.split(',')
+                    total_issues = len(issues)
     except Exception as e:
-        print(f"ERROR: Failed to validate dataset: {e}")
-        return False
-
-
-def install_python_dependencies():
-    """Install required Python packages with proper environment handling."""
-    # Base packages for the benchmark
-    base_packages = [
-        'pytest',
-        'requests',
-        'gitpython'
-    ]
+        print(f"  ⚠️ Could not parse config for issue count: {e}")
+        print(f"  Using default: {total_issues} issues")
     
-    # Repository-specific packages detected from dataset
-    repo_packages = {
-        'astropy': ['astropy', 'numpy', 'scipy', 'PyYAML'],
-        'scikit-learn': ['scikit-learn', 'numpy', 'scipy', 'pandas', 'joblib'],
-        'sympy': ['sympy', 'mpmath'],
-        'django': ['Django', 'psycopg2-binary', 'Pillow'],
-        'flask': ['Flask', 'Werkzeug', 'Jinja2', 'click'],
-        'requests': ['requests', 'urllib3', 'chardet', 'certifi'],
-        'matplotlib': ['matplotlib', 'numpy', 'cycler', 'kiwisolver'],
-        'pytest': ['pytest', 'pluggy', 'py'],
-        'sphinx': ['Sphinx', 'docutils', 'Pygments'],
-        'pandas': ['pandas', 'numpy', 'python-dateutil', 'pytz']
+    # Reset state.json to initial state with enhanced structure
+    initial_state = {
+        "test_config": {
+            "mode": "RANGE",
+            "total_issues": total_issues,
+            "dataset_file": "swe_bench_lite.jsonl",
+            "start_index": 0,
+            "end_index": total_issues - 1
+        },
+        "current_state": {
+            "current_issue_index": 0,
+            "issues_attempted": 0,
+            "issues_passed": 0,
+            "issues_failed": 0,
+            "issues_skipped": 0,
+            "last_activity": None,
+            "session_start": None,
+            "total_attempts": 0,
+            "unique_issues_attempted": 0,
+            "avg_attempts_per_issue": 0.0,
+            "session_duration_minutes": 0.0
+        },
+        "issue_status": {},
+        "failed_issues": [],
+        "skipped_issues": [],
+        "completed_issues": [],
+        "retry_queue": [],
+        "issue_attempts": {},
+        "overall_stats": {},
+        "current_issue_index": 0,
+        "last_updated": None
     }
     
-    # Auto-detect required packages from dataset
-    print("Auto-detecting required packages from dataset...")
-    required_packages = set(base_packages)
+    try:
+        with open('state.json', 'w') as f:
+            json.dump(initial_state, f, indent=2)
+        print("  ✅ Reset: state.json")
+    except Exception as e:
+        print(f"  ⚠️ Could not reset state.json: {e}")
+    
+    # Reset failure_tracker.json - tracks fail attempts per issue
+    try:
+        with open('failure_tracker.json', 'w') as f:
+            json.dump({}, f, indent=2)
+        print("  ✅ Reset: failure_tracker.json")
+    except Exception as e:
+        print(f"  ⚠️ Could not reset failure_tracker.json: {e}")
+    
+    # Reset progress.md - human-readable progress log with enhanced structure
+    initial_progress = f"""# SWE-bench Heavy Progress Log
+
+## Test Configuration
+- **Mode**: RANGE
+- **Dataset**: swe_bench_lite.jsonl
+- **Issue Selection**: {issue_selection}
+- **Total Issues**: {total_issues}
+- **Started**: Not started yet
+- **Status**: Ready to begin
+
+## Current Statistics (Per-Issue Tracking)
+- **Unique Issues Attempted**: 0/{total_issues}
+- **Total Attempts**: 0
+- **Issues Passed**: 0
+- **Issues Failed**: 0
+- **Issues Skipped**: 0
+- **Success Rate**: 0.0%
+- **Avg Attempts per Issue**: 0.0
+
+## Overall Statistics (Aggregated Across All Issues)
+- **Total Issues Processed**: 0
+- **Overall Success Rate**: 0.0%
+- **First Attempt Success Rate**: 0.0%
+- **Retry Success Rate**: 0.0%
+- **Max Attempts on Single Issue**: 0
+- **Avg Time per Successful Issue**: 0.0 minutes
+
+## Recent Activity
+No activity yet - ready to start testing
+
+## Current Issue Details
+No issues attempted yet
+
+## Notes
+- Enhanced stats tracking with per-issue and overall statistics
+- Individual attempt tracking per issue implemented
+- Automatic progress updates and backup system active
+- Session management and timing tracking active
+"""
     
     try:
-        with open('swe_bench_lite.jsonl', 'r') as f:
-            repos_found = set()
-            for line in f:
-                if line.strip():
-                    issue = json.loads(line)
-                    repo_name = issue['repo'].split('/')[0]  # Get org name
-                    repo_full = issue['repo'].split('/')[1] if '/' in issue['repo'] else repo_name  # Get repo name
-                    repos_found.add(repo_name)
-                    repos_found.add(repo_full)
-            
-            print(f"Found repositories: {sorted(repos_found)}")
-            
-            # Add packages for detected repositories
-            for repo in repos_found:
-                if repo in repo_packages:
-                    required_packages.update(repo_packages[repo])
-                    print(f"Added packages for {repo}: {repo_packages[repo]}")
-    
+        with open('progress.md', 'w') as f:
+            f.write(initial_progress)
+        print("  ✅ Reset: progress.md")
     except Exception as e:
-        print(f"Warning: Could not auto-detect packages: {e}")
-        print("Installing base packages only")
-    
-    packages = sorted(list(required_packages))
-    print(f"Installing {len(packages)} packages: {packages}")
-    
-    print("Installing Python dependencies...")
-    
-    # Check if we're in a virtual environment
-    in_venv = hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
-    
-    if in_venv:
-        print("✅ Virtual environment detected")
+        print(f"  ⚠️ Could not reset progress.md: {e}")
+
+def ensure_directories():
+    """Create required directories if missing."""
+    print("📁 Ensuring directories exist...")
+    dirs = ['runs', 'docker_results', 'issues']
+    for d in dirs:
+        if not os.path.exists(d):
+            os.makedirs(d, exist_ok=True)
+            print(f"  Created: {d}/")
+        else:
+            print(f"  Exists: {d}/")
+
+def check_docker():
+    """Verify Docker is available."""
+    print("🐳 Checking Docker...")
+    try:
+        result = run_cmd("docker --version", capture=True)
+        print(f"  {result.stdout.strip()}")
+    except:
+        print("❌ Docker not found! Install Docker first.")
+        sys.exit(1)
+
+def download_dataset():
+    """Download SWE-Bench Lite dataset if needed."""
+    print("📊 Checking dataset...")
+    if not os.path.exists('swe_bench_lite.jsonl'):
+        print("  Downloading SWE-Bench Lite dataset...")
+        run_cmd("curl -o swe_bench_lite.jsonl https://raw.githubusercontent.com/princeton-nlp/SWE-bench/main/swe_bench_lite.jsonl")
     else:
-        print("⚠️ Not in virtual environment - will try multiple installation methods")
-    
-    for package in packages:
-        success = False
-        install_methods = []
-        
-        if in_venv:
-            # In virtual environment - use normal pip
-            install_methods.append([sys.executable, '-m', 'pip', 'install', package])
-        else:
-            # Not in venv - try user install first, then system with break-system-packages
-            install_methods.extend([
-                [sys.executable, '-m', 'pip', 'install', '--user', package],
-                [sys.executable, '-m', 'pip', 'install', '--break-system-packages', package]
-            ])
-        
-        for method in install_methods:
-            try:
-                result = subprocess.run(method, check=True, capture_output=True, text=True)
-                print(f"✅ Installed: {package}")
-                success = True
-                break
-            except subprocess.CalledProcessError as e:
-                continue
-        
-        if not success:
-            print(f"⚠️ Could not install {package} - checking if already available...")
-            
-            # Check if package is available anyway
-            try:
-                __import__(package.replace('-', '_'))
-                print(f"✅ {package} is already available")
-            except ImportError:
-                print(f"❌ {package} not available")
-                print(f"   To fix: Create virtual environment with:")
-                print(f"   python3 -m venv swe_venv && source swe_venv/bin/activate && python3 setup.py")
+        print("  Dataset already exists")
 
-
-def configure_test_mode():
-    """Interactive configuration of test parameters."""
-    print("\n" + "="*50)
-    print("TEST CONFIGURATION")
-    print("="*50)
+def check_assets():
+    """Verify valuable assets exist."""
+    print("🏆 Checking valuable assets...")
     
-    state_file = "state.json"
-    
-    # Load current state
-    if os.path.exists(state_file):
-        with open(state_file, 'r') as f:
-            state = json.load(f)
+    # Check repos
+    if os.path.exists('repos') and os.listdir('repos'):
+        repo_count = len([d for d in os.listdir('repos') if os.path.isdir(f'repos/{d}')])
+        print(f"  ✅ Found {repo_count} repositories")
     else:
-        # Default state
-        state = {
-            "test_config": {
-                "mode": "ALL",
-                "total_issues": 300,
-                "dataset_file": "swe_bench_lite.jsonl",
-                "start_index": 0,
-                "end_index": 299
-            },
-            "current_state": {
-                "current_issue_index": 0,
-                "issues_attempted": 0,
-                "issues_passed": 0,
-                "issues_failed": 0,
-                "issues_skipped": 0,
-                "last_activity": None,
-                "session_start": None
-            },
-            "issue_status": {},
-            "failed_issues": [],
-            "skipped_issues": [],
-            "completed_issues": [],
-            "retry_queue": []
-        }
+        print("  ⚠️ No repositories found - you may need to clone them")
     
-    print(f"Current configuration:")
-    print(f"- Mode: {state['test_config']['mode']}")
-    print(f"- Total issues: {state['test_config']['total_issues']}")
-    print(f"- Dataset: {state['test_config']['dataset_file']}")
-    
-    print("\nTest modes:")
-    print("1. ALL - Test all 300 issues")
-    print("2. SIZE - Test first N issues")
-    print("3. RANGE - Test issues from index M to N")
-    print("4. Keep current configuration")
-    
-    choice = input("\nSelect option (1-4): ").strip()
-    
-    if choice == '1':
-        state['test_config']['mode'] = 'ALL'
-        state['test_config']['total_issues'] = 300
-        state['test_config']['start_index'] = 0
-        state['test_config']['end_index'] = 299
-    elif choice == '2':
-        try:
-            n = int(input("Enter number of issues to test: "))
-            state['test_config']['mode'] = 'SIZE'
-            state['test_config']['total_issues'] = n
-            state['test_config']['start_index'] = 0
-            state['test_config']['end_index'] = n - 1
-        except ValueError:
-            print("Invalid number, keeping current configuration")
-    elif choice == '3':
-        try:
-            start = int(input("Enter start index: "))
-            end = int(input("Enter end index: "))
-            state['test_config']['mode'] = 'RANGE'
-            state['test_config']['start_index'] = start
-            state['test_config']['end_index'] = end
-            state['test_config']['total_issues'] = end - start + 1
-        except ValueError:
-            print("Invalid range, keeping current configuration")
-    
-    # Save updated state
-    with open(state_file, 'w') as f:
-        json.dump(state, f, indent=2)
-    
-    print(f"\n✅ Configuration saved to {state_file}")
-
-
-def test_setup():
-    """Test the setup by running basic commands."""
-    print("\n" + "="*50)
-    print("TESTING SETUP")
-    print("="*50)
-    
-    # Test get_next_issue.py
-    print("Testing issue selection...")
+    # Check Docker images
     try:
-        result = subprocess.run(['python3', 'get_next_issue.py'], capture_output=True, text=True, timeout=30)
-        if result.returncode == 0:
-            print("✅ Issue selection works")
+        result = run_cmd("docker images --format 'table {{.Repository}}' | grep swe- | wc -l", capture=True)
+        image_count = int(result.stdout.strip())
+        if image_count > 0:
+            print(f"  ✅ Found {image_count} SWE Docker images")
         else:
-            print(f"❌ Issue selection failed: {result.stderr}")
-    except Exception as e:
-        print(f"❌ Issue selection test failed: {e}")
-    
-    # Test record_progress.py
-    print("Testing progress recording...")
-    try:
-        result = subprocess.run([
-            'python3', 'record_progress.py', 'test_setup', 'SKIP', 'Setup test'
-        ], capture_output=True, text=True, timeout=30)
-        if result.returncode == 0:
-            print("✅ Progress recording works")
-        else:
-            print(f"❌ Progress recording failed: {result.stderr}")
-    except Exception as e:
-        print(f"❌ Progress recording test failed: {e}")
+            print("  ⚠️ No SWE Docker images found - you may need to build them")
+    except:
+        print("  ⚠️ Could not check Docker images")
 
+def create_config():
+    """Create default configuration if missing."""
+    if os.path.exists('config.json'):
+        print("⚙️ Configuration already exists")
+        return
+        
+    print("⚙️ Creating default configuration...")
+    config = {
+        "docker_timeout": 300,
+        "max_attempts": 10,
+        "issue_selection": "0-299",
+        "repos": [
+            "astropy/astropy",
+            "django/django", 
+            "matplotlib/matplotlib",
+            "mwaskom/seaborn",
+            "pallets/flask",
+            "psf/requests",
+            "pytest-dev/pytest",
+            "scikit-learn/scikit-learn",
+            "sphinx-doc/sphinx",
+            "sympy/sympy",
+            "xarray-contrib/xarray",
+            "pylint-dev/pylint"
+        ]
+    }
+    
+    with open('config.json', 'w') as f:
+        json.dump(config, f, indent=2)
+    print("  Created config.json")
+
+def is_first_time_setup():
+    """Check if this is the first time setup is being run."""
+    # Check for key indicators that setup has been run before
+    indicators = [
+        'repos',  # Repository directory
+        'swe_bench_lite.jsonl',  # Dataset file
+        'config.json'  # Config file
+    ]
+    
+    return not all(os.path.exists(indicator) for indicator in indicators)
 
 def main():
-    """Main setup process."""
-    print("SWE-bench Heavy Setup")
-    print("="*50)
+    """Main setup routine - automated and safe."""
+    print("🚀 SWE-Bench Heavy: Automated Setup")
+    print("=" * 50)
     
-    # Step 1: Check prerequisites
-    if not verify_prerequisites():
-        sys.exit(1)
+    first_time = is_first_time_setup()
     
-    # Step 2: Create directories
-    create_directories()
+    if first_time:
+        print("🆕 First-time setup detected")
+        print("This will set up the complete environment")
+    else:
+        print("🔄 Existing setup detected")
+        print("This will only clean run data and refresh configuration")
     
-    # Step 3: Download dataset
-    if not download_dataset():
-        sys.exit(1)
+    # Step 1: Ensure Docker works
+    check_docker()
     
-    # Step 4: Validate dataset
-    if not validate_dataset():
-        sys.exit(1)
+    # Step 2: Clean run data for fresh testing
+    clean_run_data()
     
-    # Step 5: Install dependencies
-    install_python_dependencies()
+    # Step 3: Reset state tracking files
+    reset_state_files()
     
-    # Step 6: Make scripts executable
-    make_scripts_executable()
+    # Step 4: Create directories if missing
+    ensure_directories()
     
-    # Step 7: Configure test parameters
-    configure_test_mode()
+    # Step 5: Download dataset if missing
+    download_dataset()
     
-    # Step 8: Test setup
-    test_setup()
+    # Step 6: Create config if missing
+    create_config()
     
-    print("\n" + "="*50)
-    print("SETUP COMPLETE")
-    print("="*50)
-    print("Your SWE-bench Heavy environment is ready!")
-    print("\nNext steps:")
-    print("1. For autonomous bot testing:")
-    print("   Tell your bot: 'read instructions.md and attempt completion when all issues are resolved'")
-    print("2. For manual testing:")
-    print("   python3 get_next_issue.py")
-    print("3. To reset the environment:")
-    print("   python3 cleanup.py")
-    print("\nSee install.md for detailed usage instructions.")
-
+    # Step 7: Check valuable assets
+    check_assets()
+    
+    print("\n✅ Setup complete!")
+    print("📖 Read instructions.md to get started")
+    print("🎯 Run: python3 grading_docker.py <issue_id>")
+    print("🎯 Run: python3 select_issues.py '0-10' to select specific issues")
+    print("\n💡 This setup preserves all repos/ and Docker images")
+    print("💡 Only runs/ and docker_results/ are cleaned for fresh testing")
+    
+    if first_time:
+        print("\n🚨 FIRST TIME SETUP NOTES:")
+        print("- You may need to clone repositories: check repos/ directory")
+        print("- You may need to build Docker images: check docker images")
+        print("- Run 'python3 select_issues.py --help' for issue selection help")
 
 if __name__ == "__main__":
     main()

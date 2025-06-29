@@ -1,0 +1,47 @@
+# SWE-bench Heavy Progress Log
+
+## Test Configuration
+- **Mode**: RANGE
+- **Dataset**: swe_bench_lite.jsonl
+- **Issue Range**: Index 0 to 24 (inclusive)
+- **Total Issues in Range**: 25
+- **Session Started**: 2025-06-28 07:54:21
+- **Session Duration**: 195.5 minutes
+- **Status**: Active Testing
+
+## Current Statistics (Per-Issue Tracking)
+- **Unique Issues Attempted**: 25/25
+- **Total Attempts**: 36
+- **Issues Passed**: 17
+- **Issues Failed**: 17
+- **Issues Skipped**: 1
+- **Success Rate**: 68.0%
+- **Avg Attempts per Issue**: 1.44
+
+## Overall Statistics (Aggregated Across All Issues)
+- **Total Issues Processed**: 25
+- **Overall Success Rate**: 68.0%
+- **First Attempt Success Rate**: 68.0%
+- **Retry Success Rate**: 0.0%
+- **Max Attempts on Single Issue**: 11
+- **Avg Time per Successful Issue**: 0.0 minutes
+- **Fastest Solve**: 0.0 minutes
+- **Slowest Solve**: 0.0 minutes
+
+## Recent Activity
+**2025-06-28 11:09:52**: astropy__astropy-14365 - FAIL (Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_get_tables_from_qdp_file FAILED...)
+
+## Current Issue Details
+### astropy__astropy-14365 - FAIL
+- **Timestamp**: 2025-06-28 11:09:52
+- **Status**: FAIL
+- **Attempt**: #11
+- **Time on Issue**: 192.2 minutes
+- **Notes**: Failed Docker tests: astropy/io/ascii/tests/test_qdp.py::test_get_tables_from_qdp_file FAILED...
+
+
+## Notes
+- Enhanced stats tracking with per-issue and overall statistics
+- Individual attempt tracking per issue implemented
+- Automatic progress updates and backup system active
+- Session management and timing tracking active

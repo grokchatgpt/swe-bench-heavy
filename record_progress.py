@@ -167,9 +167,9 @@ def update_attempt_statistics(state: Dict[str, Any]) -> None:
     
     if 'issue_attempts' in state:
         for issue_id, attempts_data in state['issue_attempts'].items():
-            if is_benchmark_issue(issue_id):
-                total_attempts += attempts_data['attempt_count']
-                unique_issues_attempted += 1
+            # Count all issues for consistency
+            total_attempts += attempts_data['attempt_count']
+            unique_issues_attempted += 1
     
     # Update new statistics
     current['total_attempts'] = total_attempts
@@ -201,8 +201,8 @@ def main():
     state = load_state()
     current = state['current_state']
     
-    # Only update counters for real benchmark issues
-    is_real_issue = is_benchmark_issue(issue_id)
+    # Update counters for ALL issues (to keep consistency between counters and lists)
+    is_real_issue = True  # Count all issues to maintain consistency
     
     # Check if this issue had previous attempts and subtract old status
     if is_real_issue and 'issue_attempts' in state and issue_id in state['issue_attempts']:
@@ -221,12 +221,11 @@ def main():
     track_attempt(state, issue_id, status, notes)
     
     # Update legacy counters (for first attempt only)
-    if is_real_issue and state['issue_attempts'][issue_id]['attempt_count'] == 1:
+    if state['issue_attempts'][issue_id]['attempt_count'] == 1:
         current['issues_attempted'] += 1
     
     if status == 'PASS':
-        if is_real_issue:
-            current['issues_passed'] += 1
+        current['issues_passed'] += 1
         if issue_id not in state['completed_issues']:
             state['completed_issues'].append(issue_id)
         # Remove from other lists if present
@@ -234,8 +233,7 @@ def main():
             if issue_id in state[lst]:
                 state[lst].remove(issue_id)
     elif status == 'FAIL':
-        if is_real_issue:
-            current['issues_failed'] += 1
+        current['issues_failed'] += 1
         if issue_id not in state['failed_issues']:
             state['failed_issues'].append(issue_id)
         # Remove from other lists if present
@@ -243,8 +241,7 @@ def main():
             if issue_id in state[lst]:
                 state[lst].remove(issue_id)
     elif status == 'SKIP':
-        if is_real_issue:
-            current['issues_skipped'] += 1
+        current['issues_skipped'] += 1
         if issue_id not in state['skipped_issues']:
             state['skipped_issues'].append(issue_id)
         # Remove from other lists if present
@@ -299,9 +296,6 @@ def main():
             for attempt in attempts_data['attempts']:
                 print(f"  #{attempt['attempt']}: {attempt['status']} - {attempt['notes'][:50]}...")
     
-    # Show if this was excluded from stats
-    if not is_real_issue:
-        print(f"\nNOTE: '{issue_id}' excluded from benchmark statistics (setup/test issue)")
 
 
 if __name__ == "__main__":

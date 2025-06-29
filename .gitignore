@@ -3,6 +3,7 @@ runs/
 issues/
 logs/
 results/
+backup*/
 
 # github repos
 repos/
