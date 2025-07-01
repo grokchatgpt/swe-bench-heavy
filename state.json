@@ -1,31 +1,165 @@
 {
   "test_config": {
     "mode": "RANGE",
-    "total_issues": 25,
+    "total_issues": 12,
     "dataset_file": "swe_bench_lite.jsonl",
     "start_index": 0,
-    "end_index": 24
+    "end_index": 11
   },
   "current_state": {
     "current_issue_index": 0,
-    "issues_attempted": 0,
-    "issues_passed": 0,
-    "issues_failed": 0,
+    "issues_attempted": 2,
+    "issues_passed": 1,
+    "issues_failed": 9,
     "issues_skipped": 0,
-    "last_activity": null,
-    "session_start": null,
-    "total_attempts": 0,
-    "unique_issues_attempted": 0,
-    "avg_attempts_per_issue": 0.0,
-    "session_duration_minutes": 0.0
+    "last_activity": "2025-07-01T07:34:15.634734",
+    "session_start": "2025-07-01T07:16:44.852293",
+    "total_attempts": 10,
+    "unique_issues_attempted": 2,
+    "avg_attempts_per_issue": 5.0,
+    "session_duration_minutes": 17.5
   },
-  "issue_status": {},
-  "failed_issues": [],
+  "issue_status": {
+    "astropy__astropy-14182": {
+      "status": "PASS",
+      "timestamp": "2025-07-01T07:27:48.432669",
+      "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+    },
+    "django__django-12708": {
+      "status": "FAIL",
+      "timestamp": "2025-07-01T07:34:15.634734",
+      "notes": "Failed Docker tests: test_alter_index_together_remove_with_unique_together (migrations.test_operations.OperationTests) ....."
+    }
+  },
+  "failed_issues": [
+    "django__django-12708"
+  ],
   "skipped_issues": [],
-  "completed_issues": [],
+  "completed_issues": [
+    "astropy__astropy-14182"
+  ],
   "retry_queue": [],
-  "issue_attempts": {},
-  "overall_stats": {},
-  "current_issue_index": 0,
-  "last_updated": "2025-06-29T05:38:40.466815"
+  "issue_attempts": {
+    "astropy__astropy-14182": {
+      "attempt_count": 9,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:16:44.852293",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 2,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:17:52.192889",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 3,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:20:56.502759",
+          "notes": "Failed Docker tests: ERROR astropy/io/ascii/tests/test_rst.py - astropy.io.ascii.core.Inconsistent......"
+        },
+        {
+          "attempt": 4,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:21:56.201592",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_read_normal FAILED..."
+        },
+        {
+          "attempt": 5,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:22:44.444690",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 6,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:23:27.150699",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 7,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:24:20.177555",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 8,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:25:52.688353",
+          "notes": "Failed Docker tests: astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows FAILED..."
+        },
+        {
+          "attempt": 9,
+          "status": "PASS",
+          "timestamp": "2025-07-01T07:27:48.432669",
+          "notes": "Passed Docker grading tests (official SWE-Bench compliant)"
+        }
+      ],
+      "current_status": "PASS",
+      "first_attempt": "2025-07-01T07:16:44.852293",
+      "last_attempt": "2025-07-01T07:27:48.432669",
+      "total_time_minutes": 11.1,
+      "time_to_success": 11.1,
+      "first_attempt_success": false,
+      "final_status": "PASS"
+    },
+    "django__django-12708": {
+      "attempt_count": 1,
+      "attempts": [
+        {
+          "attempt": 1,
+          "status": "FAIL",
+          "timestamp": "2025-07-01T07:34:15.634734",
+          "notes": "Failed Docker tests: test_alter_index_together_remove_with_unique_together (migrations.test_operations.OperationTests) ....."
+        }
+      ],
+      "current_status": "FAIL",
+      "first_attempt": "2025-07-01T07:34:15.634734",
+      "last_attempt": "2025-07-01T07:34:15.634734",
+      "total_time_minutes": 0.0,
+      "time_to_success": null,
+      "first_attempt_success": false,
+      "final_status": "FAIL"
+    }
+  },
+  "overall_stats": {
+    "total_issues_processed": 2,
+    "total_attempts_across_all_issues": 10,
+    "total_passes": 1,
+    "total_fails": 1,
+    "total_skips": 0,
+    "overall_success_rate": 50.0,
+    "avg_attempts_per_issue": 5.0,
+    "first_attempt_success_count": 0,
+    "first_attempt_success_rate": 0.0,
+    "retry_success_count": 1,
+    "retry_success_rate": 50.0,
+    "max_attempts_on_single_issue": 9,
+    "min_attempts_on_single_issue": 1,
+    "fastest_solve_minutes": 11.1,
+    "slowest_solve_minutes": 11.1,
+    "avg_time_per_successful_issue": 11.1,
+    "total_time_on_successful_issues": 11.1,
+    "issues_solved_first_attempt": [],
+    "issues_requiring_retries": [
+      "astropy__astropy-14182"
+    ],
+    "most_difficult_issues": [
+      {
+        "issue_id": "astropy__astropy-14182",
+        "attempts": 9,
+        "status": "PASS"
+      },
+      {
+        "issue_id": "django__django-12708",
+        "attempts": 1,
+        "status": "FAIL"
+      }
+    ]
+  },
+  "current_issue_index": 40,
+  "last_updated": "2025-07-01T07:34:15.642728"
 }

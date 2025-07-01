@@ -1,0 +1,88 @@
+=== SWE-Bench Heavy Docker Test Execution ===
+Applying test patch...
+Git apply check passed, applying patch...
+Patch application completed
+Fixing pytest version requirements...
+Copying solution files...
+Copied: fixedwidth.py
+Copied: debug_test.py
+Copied: astropy/io/ascii/rst.py
+Copied: rst.py
+===== Start Test Output =====
+Using conda environment...
+Current conda environment: testbed
+Python path: /opt/miniconda3/envs/testbed/bin/python
+Pytest check: 7.4.0
+Internet access disabled
+============================= test session starts ==============================
+platform linux -- Python 3.9.20, pytest-7.4.0, pluggy-1.3.0 -- /opt/miniconda3/envs/testbed/bin/python
+cachedir: .pytest_cache
+
+Running tests with Astropy version 5.3.dev133+ga5917978be.d20241024.
+Running tests in astropy/io/ascii/tests/test_rst.py.
+
+Date: 2025-07-01T14:27:48
+
+Platform: Linux-6.10.14-linuxkit-x86_64-with-glibc2.35
+
+Executable: /opt/miniconda3/envs/testbed/bin/python
+
+Full Python Version: 
+3.9.20 (main, Oct  3 2024, 07:27:41) 
+[GCC 11.2.0]
+
+encodings: sys: utf-8, locale: UTF-8, filesystem: utf-8
+byteorder: little
+float info: dig: 15, mant_dig: 15
+
+Package versions: 
+Numpy: 1.25.2
+Scipy: not available
+Matplotlib: not available
+h5py: not available
+Pandas: not available
+PyERFA: 2.0.0.3
+Cython: not available
+Scikit-image: not available
+asdf: not available
+pyarrow: not available
+
+Using Astropy options: remote_data: none.
+
+hypothesis profile 'ci' -> database=None, deadline=None, print_blob=True, derandomize=True
+CI: undefined
+ARCH_ON_CI: undefined
+IS_CRON: undefined
+
+rootdir: /testbed
+configfile: setup.cfg
+plugins: cov-4.1.0, astropy-0.10.0, mock-3.11.1, astropy-header-0.2.2, doctestplus-1.0.0, remotedata-0.4.0, xdist-3.3.1, openfiles-0.5.0, filter-subpackage-0.1.2, arraydiff-0.5.0, hypothesis-6.82.6
+collecting ... collected 10 items
+
+astropy/io/ascii/tests/test_rst.py::test_read_normal PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_normal_names PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_normal_names_include PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_normal_exclude PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_unbounded_right_column PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_unbounded_right_column_header PASSED
+astropy/io/ascii/tests/test_rst.py::test_read_right_indented_table PASSED
+astropy/io/ascii/tests/test_rst.py::test_trailing_spaces_in_row_definition PASSED
+astropy/io/ascii/tests/test_rst.py::test_write_normal PASSED
+astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows PASSED
+
+=========================== short test summary info ============================
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_normal
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_normal_names
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_normal_names_include
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_normal_exclude
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_unbounded_right_column
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_unbounded_right_column_header
+PASSED astropy/io/ascii/tests/test_rst.py::test_read_right_indented_table
+PASSED astropy/io/ascii/tests/test_rst.py::test_trailing_spaces_in_row_definition
+PASSED astropy/io/ascii/tests/test_rst.py::test_write_normal
+PASSED astropy/io/ascii/tests/test_rst.py::test_rst_with_header_rows
+============================== 10 passed in 0.06s ==============================
+===== End Test Output =====
+Checking patch astropy/io/ascii/tests/test_rst.py...
+Applied patch astropy/io/ascii/tests/test_rst.py cleanly.
+<frozen importlib._bootstrap>:228: RuntimeWarning: numpy.ndarray size changed, may indicate binary incompatibility. Expected 80 from C header, got 96 from PyObject

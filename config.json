@@ -1,9 +1,10 @@
 {
   "docker_timeout": 300,
   "max_attempts": 30,
-  "issue_selection": "0,2,7,16,120,125,143,144,147,149,150,154,156,160,161,166,169,183,184,206,207,222,223,247,299",
-  "description": "25-Issue Gauntlet - 2 per repo + 1 random last issue",
-  "strategy": "Designed to expose breaking point",
+  "issue_selection": "1,40,122,143,147,152,157,163,168,190,209,238",
+  "description": "12-Issue Balanced - 1 per repo",
+  "strategy": "Streamlined for faster completion",
+  "NoSkipping": true,
   "repos": [
     "astropy/astropy",
     "django/django",
@@ -11,11 +12,11 @@
     "mwaskom/seaborn",
     "pallets/flask",
     "psf/requests",
+    "pydata/xarray",
+    "pylint-dev/pylint",
     "pytest-dev/pytest",
     "scikit-learn/scikit-learn",
     "sphinx-doc/sphinx",
-    "sympy/sympy",
-    "xarray-contrib/xarray",
-    "pylint-dev/pylint"
+    "sympy/sympy"
   ]
 }

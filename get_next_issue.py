@@ -112,9 +112,12 @@ def select_next_issue(issues: list, config: Dict[str, Any], progress: Dict[str, 
     if not selected_indices:
         return None
     
+    # Check NoSkipping configuration
+    no_skipping = config.get('NoSkipping', False)
+    
     # Calculate completion statistics - FIXED: Handle overlapping issue states correctly
     total_selected = len(selected_indices)
-    completed = len(progress.get('completed_issues', []))
+    passed = len(progress.get('completed_issues', []))
     failed = len(progress.get('failed_issues', []))
     skipped = len(progress.get('skipped_issues', []))
     
@@ -124,11 +127,13 @@ def select_next_issue(issues: list, config: Dict[str, Any], progress: Dict[str, 
         progress.get('failed_issues', []) + 
         progress.get('skipped_issues', [])
     )
-    unique_processed = len(all_processed_issues)
-    remaining = total_selected - unique_processed
+    unique_attempted = len(all_processed_issues)
+    remaining = total_selected - unique_attempted
     
-    print(f"📊 Progress: {completed} completed, {failed} failed, {skipped} skipped")
-    print(f"📊 Unique issues processed: {unique_processed}/{total_selected}, {remaining} remaining")
+    print(f"📊 Progress: {passed} passed, {failed} failed, {skipped} skipped")
+    print(f"📊 Unique issues attempted: {unique_attempted}/{total_selected}, {remaining} remaining")
+    if no_skipping:
+        print(f"🔒 NoSkipping mode: Will retry current issue until passed")
     
     # Get current position in the selection list
     current_idx = progress.get('current_issue_index', 0)
@@ -137,6 +142,28 @@ def select_next_issue(issues: list, config: Dict[str, Any], progress: Dict[str, 
     current_position = 0
     if current_idx in selected_indices:
         current_position = selected_indices.index(current_idx)
+    
+    # NOSKIPPING LOGIC: If NoSkipping is enabled, check current issue first
+    if no_skipping and current_idx in selected_indices:
+        if current_idx < len(issues):
+            current_issue = issues[current_idx]
+            current_issue_id = current_issue['instance_id']
+            
+            # If current issue hasn't been completed, return it (regardless of failed/skipped status)
+            if current_issue_id not in progress.get('completed_issues', []):
+                # Check circuit breaker
+                failure_count = check_failure_attempts(current_issue_id)
+                max_attempts = config.get('max_attempts', 10)
+                
+                if failure_count >= max_attempts:
+                    print(f"🚨 NoSkipping: Current issue {current_issue_id} hit circuit breaker ({failure_count}/{max_attempts})")
+                    print(f"🔄 NoSkipping: Moving to next issue due to circuit breaker")
+                else:
+                    if current_issue_id in progress.get('failed_issues', []) or current_issue_id in progress.get('skipped_issues', []):
+                        print(f"🔒 NoSkipping: Retrying current issue {current_issue_id} (attempt {failure_count + 1}/{max_attempts})")
+                    else:
+                        print(f"🔒 NoSkipping: Continuing with current issue {current_issue_id}")
+                    return current_issue
     
     # PHASE 1: Look for fresh unprocessed issues first
     for i in range(current_position, len(selected_indices)):
@@ -255,7 +282,7 @@ def main():
     
     print(f"📊 Dataset: {len(issues)} total issues")
     print(f"⚙️ Selection: {config.get('issue_selection', '0-299')}")
-    print(f"📈 Progress: {len(progress.get('completed_issues', []))} completed, {len(progress.get('failed_issues', []))} failed")
+    print(f"📈 Progress: {len(progress.get('completed_issues', []))} passed, {len(progress.get('failed_issues', []))} failed")
     
     # Select next issue
     next_issue = select_next_issue(issues, config, progress)
@@ -263,7 +290,7 @@ def main():
     if not next_issue:
         print("\n🎉 YOU HAVE COMPLETED ALL THE ASSIGNED ISSUES! CONGRATULATIONS! THE TESTING IS 100% COMPLETE.")
         print("=" * 60)
-        print(f"✅ Completed: {len(progress.get('completed_issues', []))}")
+        print(f"✅ Passed: {len(progress.get('completed_issues', []))}")
         print(f"❌ Failed: {len(progress.get('failed_issues', []))}")
         print(f"⏭️ Skipped: {len(progress.get('skipped_issues', []))}")
         
@@ -337,7 +364,7 @@ def main():
     print(f"1. Analyze the problem in {work_dir}/")
     print(f"2. Develop your solution")
     print(f"3. Test with: python3 grading_docker.py {issue_id}")
-    print(f"4. Iterate until tests pass. Read instructions.md if you are confused - otherwise proceed to solving the problem. Hint: If this is not your first attempt at the problem - your existing solution is wrong - analyze why.")
+    print(f"4. Iterate until tests pass. Read instructions.md if you are confused - otherwise proceed to solving the problem. Hint: If this is not your first attempt at the problem - your existing solution is wrong - read fix summary and analyze why - identify what you missed.")
     
     # Show failure attempts if any
     failure_count = check_failure_attempts(issue_id)

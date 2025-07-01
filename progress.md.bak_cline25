@@ -1,0 +1,47 @@
+# SWE-bench Heavy Progress Log
+
+## Test Configuration
+- **Mode**: RANGE
+- **Dataset**: swe_bench_lite.jsonl
+- **Issue Range**: Index 0 to 24 (inclusive)
+- **Total Issues in Range**: 25
+- **Session Started**: 2025-06-29 05:42:12
+- **Session Duration**: 95.9 minutes
+- **Status**: Active Testing
+
+## Current Statistics (Per-Issue Tracking)
+- **Issues Attempted**: 25/300
+- **Total Attempts**: 49
+- **Issues Passed**: 25
+- **Issues Failed**: 9
+- **Issues Skipped**: 5
+- **Success Rate**: 100.0%
+- **Avg Attempts per Issue**: 1.96
+
+## Overall Statistics (Aggregated Across All Issues)
+- **Total Issues Processed**: 25
+- **Overall Success Rate**: 96.0%
+- **First Attempt Success Rate**: 72.0%
+- **Retry Success Rate**: 14.3%
+- **Max Attempts on Single Issue**: 5
+- **Avg Time per Successful Issue**: 0.1 minutes
+- **Fastest Solve**: 0.0 minutes
+- **Slowest Solve**: 1.7 minutes
+
+## Recent Activity
+**2025-06-29 07:18:32**: mwaskom__seaborn-2848 - PASS (Solution is correct - target test test_hue_order is passing, all required tests pass, unrelated pytest API failure)
+
+## Current Issue Details
+### mwaskom__seaborn-2848 - FAIL
+- **Timestamp**: 2025-06-29 07:18:04
+- **Status**: FAIL
+- **Attempt**: #4
+- **Time on Issue**: 68.4 minutes
+- **Notes**: Failed Docker tests: FAILED tests/test_relational.py::TestScatterPlotter::test_unfilled_marker_edgecolor_warning...
+
+
+## Notes
+- Enhanced stats tracking with per-issue and overall statistics
+- Individual attempt tracking per issue implemented
+- Automatic progress updates and backup system active
+- Session management and timing tracking active

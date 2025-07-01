@@ -3,41 +3,41 @@
 ## Test Configuration
 - **Mode**: RANGE
 - **Dataset**: swe_bench_lite.jsonl
-- **Issue Range**: Index 0 to 24 (inclusive)
-- **Total Issues in Range**: 25
-- **Session Started**: 2025-06-28 20:15:49
-- **Session Duration**: 539.8 minutes
+- **Issue Range**: Index 0 to 11 (inclusive)
+- **Total Issues in Range**: 12
+- **Session Started**: 2025-07-01 00:56:51
+- **Session Duration**: 164.8 minutes
 - **Status**: Active Testing
 
 ## Current Statistics (Per-Issue Tracking)
-- **Unique Issues Attempted**: 25/25
-- **Total Attempts**: 99
-- **Issues Passed**: 25
-- **Issues Failed**: 45
-- **Issues Skipped**: 9
-- **Success Rate**: 100.0%
-- **Avg Attempts per Issue**: 3.96
+- **Unique Issues Attempted**: 5/12
+- **Total Attempts**: 42
+- **Issues Passed**: 4
+- **Issues Failed**: 38
+- **Issues Skipped**: 0
+- **Success Rate**: 80.0%
+- **Avg Attempts per Issue**: 8.4
 
 ## Overall Statistics (Aggregated Across All Issues)
-- **Total Issues Processed**: 25
-- **Overall Success Rate**: 100.0%
-- **First Attempt Success Rate**: 28.0%
-- **Retry Success Rate**: 72.2%
-- **Max Attempts on Single Issue**: 25
-- **Avg Time per Successful Issue**: 27.1 minutes
+- **Total Issues Processed**: 5
+- **Overall Success Rate**: 80.0%
+- **First Attempt Success Rate**: 20.0%
+- **Retry Success Rate**: 75.0%
+- **Max Attempts on Single Issue**: 16
+- **Avg Time per Successful Issue**: 22.8 minutes
 - **Fastest Solve**: 0.0 minutes
-- **Slowest Solve**: 484.7 minutes
+- **Slowest Solve**: 66.8 minutes
 
 ## Recent Activity
-**2025-06-29 05:15:38**: mwaskom__seaborn-2848 - PASS (Passed Docker grading tests (official SWE-Bench compliant))
+**2025-07-01 03:41:38**: pallets__flask-4045 - FAIL (Failed Docker tests: ERROR tests/test_basic.py::test_flashes - DeprecationWarning: 'werkzeug.urls.......)
 
 ## Current Issue Details
-### mwaskom__seaborn-2848 - PASS
-- **Timestamp**: 2025-06-29 05:15:38
-- **Status**: PASS
-- **Attempt**: #25
-- **Time on Issue**: 484.7 minutes
-- **Notes**: Passed Docker grading tests (official SWE-Bench compliant)
+### pallets__flask-4045 - FAIL
+- **Timestamp**: 2025-07-01 03:41:38
+- **Status**: FAIL
+- **Attempt**: #14
+- **Time on Issue**: 47.1 minutes
+- **Notes**: Failed Docker tests: ERROR tests/test_basic.py::test_flashes - DeprecationWarning: 'werkzeug.urls.......
 
 
 ## Notes

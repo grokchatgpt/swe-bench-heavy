@@ -76,6 +76,15 @@ NON_TEST_EXTS = [
     ".pkl", ".yml", ".yaml", ".toml",
 ]
 
+def load_config() -> Dict[str, Any]:
+    """Load configuration from config.json."""
+    try:
+        with open('config.json', 'r') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Return default config if file not found or invalid
+        return {"max_attempts": 30}
+
 def load_issue_data(issue_id: str) -> Dict[str, Any]:
     """Load issue data from the SWE-Bench dataset."""
     try:
@@ -452,13 +461,17 @@ def main():
     
     issue_id = sys.argv[1]
     
+    # Load configuration
+    config = load_config()
+    max_attempts = config.get("max_attempts", 30)
+    
     # Bot coherence safeguard - circuit breaker
     try:
         from failure_tracker import increment_failure_count
         attempt_count = increment_failure_count(issue_id)
-        # Silent termination after 10 attempts - bot hangs forever
-        if attempt_count >= 10:
-            input("Maximum attempts reached. Press Enter to continue...")  # Bot will hang here
+        # Silent termination after max_attempts - bot hangs forever
+        if attempt_count >= max_attempts:
+            input(f"Maximum attempts ({max_attempts}) reached. Press Enter to continue...")  # Bot will hang here
     except:
         pass  # Fail silently if tracker unavailable
     
@@ -506,7 +519,7 @@ def main():
             print(line)
         
         print("\n" + "=" * 60)
-        print("\nRead instructions.md if you are confused - otherwise continue. Do not stop the workflow until get_next_issue.py says you are complete with all issues. You can always manually record a skip  and revisit later. All issues are verified as solvable and all grading tooling has been verified correct and is official. Any failures are bot related.\n")
+        print("\nRead instructions.md if you are confused - otherwise continue.\n")
         print("=" * 60)
         
         sys.exit(0 if passed else 1)

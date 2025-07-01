@@ -273,6 +273,19 @@ def create_config():
     """Create default configuration if missing."""
     if os.path.exists('config.json'):
         print("⚙️ Configuration already exists")
+        # Check if NoSkipping field exists, add it if missing
+        try:
+            with open('config.json', 'r') as f:
+                config = json.load(f)
+            
+            # Add NoSkipping field if missing (default to False for backward compatibility)
+            if 'NoSkipping' not in config:
+                config['NoSkipping'] = False
+                with open('config.json', 'w') as f:
+                    json.dump(config, f, indent=2)
+                print("  ✅ Added NoSkipping field to existing config")
+        except Exception as e:
+            print(f"  ⚠️ Could not update config with NoSkipping: {e}")
         return
         
     print("⚙️ Creating default configuration...")
@@ -280,6 +293,7 @@ def create_config():
         "docker_timeout": 300,
         "max_attempts": 10,
         "issue_selection": "0-299",
+        "NoSkipping": False,
         "repos": [
             "astropy/astropy",
             "django/django", 
@@ -298,7 +312,7 @@ def create_config():
     
     with open('config.json', 'w') as f:
         json.dump(config, f, indent=2)
-    print("  Created config.json")
+    print("  Created config.json with NoSkipping feature")
 
 def is_first_time_setup():
     """Check if this is the first time setup is being run."""
@@ -340,7 +354,7 @@ def main():
     # Step 5: Download dataset if missing
     download_dataset()
     
-    # Step 6: Create config if missing
+    # Step 6: Create config if missing (includes NoSkipping field)
     create_config()
     
     # Step 7: Check valuable assets
@@ -352,12 +366,14 @@ def main():
     print("🎯 Run: python3 select_issues.py '0-10' to select specific issues")
     print("\n💡 This setup preserves all repos/ and Docker images")
     print("💡 Only runs/ and docker_results/ are cleaned for fresh testing")
+    print("💡 NoSkipping feature available - set 'NoSkipping': true in config.json")
     
     if first_time:
         print("\n🚨 FIRST TIME SETUP NOTES:")
         print("- You may need to clone repositories: check repos/ directory")
         print("- You may need to build Docker images: check docker images")
         print("- Run 'python3 select_issues.py --help' for issue selection help")
+        print("- Set 'NoSkipping': true in config.json to retry same issue until passed")
 
 if __name__ == "__main__":
     main()
